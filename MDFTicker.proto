@@ -1,0 +1,31 @@
+option optimize_for = SPEED;
+message OrderEasy{
+    required string symbol = 1;
+    required string updateTime = 2;
+    required double bid = 3;
+    required double ask = 4;
+    optional double last = 5;
+    optional double open = 6;
+    optional double high = 7;
+    optional double low = 8;
+    optional int32 vol = 9;
+    optional int32 openInterest = 10;
+    optional int32 bidvol=11;
+    optional int32 askvol=12;
+    optional double bid2 = 13;
+    optional double ask2 = 14;
+    optional double bid3 = 15;
+    optional double ask3 = 16;
+    optional double bid4 = 17;
+    optional double ask4 = 18;
+    optional double bid5 = 19;
+    optional double ask5 = 20;
+    optional int32 bidVol2 = 21;
+    optional int32 askVol2 = 22;
+    optional int32 bidVol3 = 23;
+    optional int32 askVol3 = 24;
+    optional int32 bidVol4 = 25;
+    optional int32 askVol4 = 26;
+    optional int32 bidVol5 = 27;
+    optional int32 askVol5 = 28;
+}

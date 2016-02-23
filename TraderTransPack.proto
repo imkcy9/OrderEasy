@@ -1,0 +1,189 @@
+option optimize_for = SPEED;
+message ReqCancel{
+    required string control_id = 1;
+    required int32 sub_account = 2;
+    required int32 order_ref = 3;
+    required string symbol = 4;
+}
+
+message ReqOrder{
+    required string control_id = 1;
+    required int32 sub_account = 2;
+    required int32 order_ref = 3;
+    required string symbol = 4;
+    required string offsetFlag = 5;
+    required string direction = 6;
+    required string hedgeFlag = 7;
+    required int32 volume = 8;
+    required double price = 9;
+    optional int32 order_type = 10;
+}
+
+message RepTrade
+{
+    required int32 order_ref = 1;
+    required int32 volume = 2;
+    required double price = 3;
+    optional string symbol = 4;
+    optional string offsetFlag = 5;
+    optional string direction = 6;
+    optional int32 trade_id = 7;
+}
+
+message RepCancel{
+    required int32 order_ref = 1;
+    required int32 volume = 2;
+}
+
+message RepErr{
+    required int32 order_ref = 1;
+    required int32 error_id = 2;
+}
+
+message RcReqLogin{
+    required string client_id = 1;
+}
+
+message RcRespLogin{
+    required string client_id = 1;
+}
+
+
+message RcTradeOpen{
+    required string category = 1;
+    required int32 volume = 2;
+}
+
+message RcTradeCancel{
+    required string symbol = 1;
+    required int32 volume = 2;
+}
+
+message RcReqTradeSet{
+    required int32 account_id = 1;
+}
+
+message RcRespTradeSet{
+    required int32 account_id = 1;
+    required int32 rtn_code = 2;
+    repeated RcTradeOpen trade_open = 3;
+    repeated RcTradeCancel trade_cancel = 4;
+}
+
+
+message RcTradingAccountInfo{
+    required double PreMortgage = 1;     ///上次质押金额
+    required double PreCredit = 2;       ///上次信用额度
+    required double PreDeposit = 3;      ///上次存款额
+    required double PreBalance = 4;      ///上次结算准备金
+    required double PreMargin = 5;       ///上次占用的保证金
+    required double InterestBase = 6;    ///利息基数
+    required double Interest = 7;        ///利息收入
+    required double Deposit = 8;         ///入金金额
+    required double Withdraw = 9;        ///出金金额
+    required double FrozenMargin = 10;   ///冻结的保证金
+    required double FrozenCash = 11;     ///冻结的资金
+    required double FrozenCommission = 12;  ///冻结的手续费
+    required double CurrMargin = 13;     ///当前保证金总额
+    required double CashIn = 14;         ///资金差额
+    required double Commission = 15;     ///手续费
+    required double CloseProfit = 16;    ///平仓盈亏
+    required double PositionProfit = 17; ///持仓盈亏
+    required double Balance = 18;        ///期货结算准备金
+    required double Available = 19;      ///可用资金
+    required double WithdrawQuota = 20;  ///可取资金
+    required double Reserve = 21;        ///基本准备金
+    required string TradingDay = 22;     ///交易日
+    required int32 SettlementID = 23;    ///结算编号
+    required double Credit = 24;         ///信用额度
+    required double Mortgage = 25;       ///质押金额
+    required double ExchangeMargin = 26; ///交易所保证金
+    required double DeliveryMargin = 27; ///投资者交割保证金
+    required double ExchangeDeliveryMargin = 28;    ///交易所交割保证金
+}
+
+message RcReqTradingAccount{
+    required int32 account_id = 1;
+}
+
+message RcRespTradingAccount{
+    required int32 account_id = 1;
+    required int32 rtn_code = 2;
+    optional RcTradingAccountInfo trade_info = 3;
+}
+
+
+
+message RcPositionDetail{
+    required string InstrumentID = 1;            ///合约代码
+    required string HedgeFlag = 2;               ///投机套保标志
+    required string Direction = 3;               ///买卖
+    required string OpenDate = 4;                ///开仓日期
+    required int32 TradeID = 5;                  ///成交编号
+    required int32 Volume = 6;                   ///数量
+    required double OpenPrice = 7;               ///开仓价
+    required string TradingDay = 8;              ///交易日
+    required int32 SettlementID = 9;             ///结算编号
+    required string TradeType = 10;              ///成交类型
+    required string CombInstrumentID = 11;       ///组合合约代码
+    required string ExchangeID = 12;             ///交易所代码
+    required double CloseProfitByDate = 13;      ///逐日盯市平仓盈亏
+    required double CloseProfitByTrade = 14;     ///逐笔对冲平仓盈亏
+    required double PositionProfitByDate = 15;   ///逐日盯市持仓盈亏
+    required double PositionProfitByTrade = 16;  ///逐笔对冲持仓盈亏
+    required double Margin = 17;                 ///投资者保证金
+    required double ExchMargin = 18;             ///交易所保证金
+    required double MarginRateByMoney = 19;      ///保证金率
+    required double MarginRateByVolume = 20;     ///保证金率(按手数)
+    required double LastSettlementPrice = 21;    ///昨结算价
+    required double SettlementPrice = 22;        ///结算价
+    required int32 CloseVolume = 23;             ///平仓量
+    required double CloseAmount = 24;            ///平仓金额
+}
+
+message RcReqPositionDetail{
+    required int32 account_id = 1;
+}
+
+message RcRespPositionDetail{
+    required int32 account_id = 1;
+    required int32 rtn_code = 2;
+    repeated RcPositionDetail p_detail = 3;
+}
+
+message RcReqOrder{
+    required int32 sub_account = 1;
+    required int32 order_ref = 2;
+    required string symbol = 3;
+    required string offsetFlag = 4;
+    required string direction = 5;
+    required string hedgeFlag = 6;
+    required int32 volume = 7;
+    required double price = 8;
+    optional int32 orderType = 9;
+}
+
+message RcReqCancel{
+    required int32 sub_account = 1; 
+    required int32 order_ref = 2;
+    required string symbol = 3;
+}
+
+message RcRtnCancel{
+    required int32 sub_account = 1; 
+    required int32 order_ref = 2;
+    required int32 volume = 3;
+}
+message RcRtnTrade {
+    required int32 sub_account = 1; 
+    required int32 order_ref = 2;
+    required int32 volume = 3;
+    required double price = 4;
+    optional string symbol = 5;
+    optional string offsetFlag = 6;
+    optional string direction = 7;
+    optional int32 trade_id = 8;
+}
+
+
+

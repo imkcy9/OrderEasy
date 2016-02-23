@@ -1,0 +1,77 @@
+F:\wxu\OrderEasy\OrderEasy\bin\Debug\OrderEasy.exe.config
+F:\wxu\OrderEasy\OrderEasy\bin\Debug\OrderEasy.exe
+F:\wxu\OrderEasy\OrderEasy\bin\Debug\OrderEasy.pdb
+F:\wxu\OrderEasy\OrderEasy\bin\Debug\Antlr3.Runtime.dll
+F:\wxu\OrderEasy\OrderEasy\bin\Debug\Castle.Core.dll
+F:\wxu\OrderEasy\OrderEasy\bin\Debug\Castle.DynamicProxy2.dll
+F:\wxu\OrderEasy\OrderEasy\bin\Debug\Castle.MicroKernel.dll
+F:\wxu\OrderEasy\OrderEasy\bin\Debug\Castle.Windsor.dll
+F:\wxu\OrderEasy\OrderEasy\bin\Debug\clrzmq.dll
+F:\wxu\OrderEasy\OrderEasy\bin\Debug\Esent.Collections.dll
+F:\wxu\OrderEasy\OrderEasy\bin\Debug\Esent.Interop.dll
+F:\wxu\OrderEasy\OrderEasy\bin\Debug\FirebirdSql.Data.FirebirdClient.dll
+F:\wxu\OrderEasy\OrderEasy\bin\Debug\FluentNHibernate.dll
+F:\wxu\OrderEasy\OrderEasy\bin\Debug\Iesi.Collections.dll
+F:\wxu\OrderEasy\OrderEasy\bin\Debug\log4net.dll
+F:\wxu\OrderEasy\OrderEasy\bin\Debug\MySql.Data.dll
+F:\wxu\OrderEasy\OrderEasy\bin\Debug\NHibernate.ByteCode.Castle.dll
+F:\wxu\OrderEasy\OrderEasy\bin\Debug\NHibernate.dll
+F:\wxu\OrderEasy\OrderEasy\bin\Debug\nunit.framework.dll
+F:\wxu\OrderEasy\OrderEasy\bin\Debug\protobuf-net.dll
+F:\wxu\OrderEasy\OrderEasy\bin\Debug\SourceGrid.dll
+F:\wxu\OrderEasy\OrderEasy\bin\Debug\Castle.Core.xml
+F:\wxu\OrderEasy\OrderEasy\bin\Debug\Castle.DynamicProxy2.xml
+F:\wxu\OrderEasy\OrderEasy\bin\Debug\Castle.MicroKernel.xml
+F:\wxu\OrderEasy\OrderEasy\bin\Debug\Castle.Windsor.xml
+F:\wxu\OrderEasy\OrderEasy\bin\Debug\Esent.Collections.xml
+F:\wxu\OrderEasy\OrderEasy\bin\Debug\FluentNHibernate.xml
+F:\wxu\OrderEasy\OrderEasy\bin\Debug\Iesi.Collections.xml
+F:\wxu\OrderEasy\OrderEasy\bin\Debug\NHibernate.xml
+F:\wxu\OrderEasy\OrderEasy\bin\Debug\NHibernate.ByteCode.Castle.xml
+F:\wxu\OrderEasy\OrderEasy\obj\Debug\ResolveAssemblyReference.cache
+F:\wxu\OrderEasy\OrderEasy\obj\Debug\OrderEasy.OrderEasy.resources
+F:\wxu\OrderEasy\OrderEasy\obj\Debug\ListViewEx.SubItemEventArgs.resources
+F:\wxu\OrderEasy\OrderEasy\obj\Debug\OrderEasy.Properties.Resources.resources
+F:\wxu\OrderEasy\OrderEasy\obj\Debug\OrderEasy.SetForm.resources
+F:\wxu\OrderEasy\OrderEasy\obj\Debug\GenerateResource.read.1.tlog
+F:\wxu\OrderEasy\OrderEasy\obj\Debug\GenerateResource.write.1.tlog
+F:\wxu\OrderEasy\OrderEasy\obj\Debug\OrderEasy.exe
+F:\wxu\OrderEasy\OrderEasy\obj\Debug\OrderEasy.pdb
+C:\Users\kcy\Desktop\RC Code\OrderEasy\OrderEasy\bin\Debug\OrderEasy.exe.config
+C:\Users\kcy\Desktop\RC Code\OrderEasy\OrderEasy\obj\Debug\OrderEasy.exe
+C:\Users\kcy\Desktop\RC Code\OrderEasy\OrderEasy\obj\Debug\OrderEasy.pdb
+C:\Users\kcy\Desktop\RC Code\OrderEasy\OrderEasy\bin\Debug\OrderEasy.exe
+C:\Users\kcy\Desktop\RC Code\OrderEasy\OrderEasy\bin\Debug\OrderEasy.pdb
+C:\Users\kcy\Desktop\RC Code\OrderEasy\OrderEasy\bin\Debug\Antlr3.Runtime.dll
+C:\Users\kcy\Desktop\RC Code\OrderEasy\OrderEasy\bin\Debug\Castle.Core.dll
+C:\Users\kcy\Desktop\RC Code\OrderEasy\OrderEasy\bin\Debug\Castle.DynamicProxy2.dll
+C:\Users\kcy\Desktop\RC Code\OrderEasy\OrderEasy\bin\Debug\Castle.MicroKernel.dll
+C:\Users\kcy\Desktop\RC Code\OrderEasy\OrderEasy\bin\Debug\Castle.Windsor.dll
+C:\Users\kcy\Desktop\RC Code\OrderEasy\OrderEasy\bin\Debug\clrzmq.dll
+C:\Users\kcy\Desktop\RC Code\OrderEasy\OrderEasy\bin\Debug\Esent.Collections.dll
+C:\Users\kcy\Desktop\RC Code\OrderEasy\OrderEasy\bin\Debug\Esent.Interop.dll
+C:\Users\kcy\Desktop\RC Code\OrderEasy\OrderEasy\bin\Debug\FirebirdSql.Data.FirebirdClient.dll
+C:\Users\kcy\Desktop\RC Code\OrderEasy\OrderEasy\bin\Debug\FluentNHibernate.dll
+C:\Users\kcy\Desktop\RC Code\OrderEasy\OrderEasy\bin\Debug\Iesi.Collections.dll
+C:\Users\kcy\Desktop\RC Code\OrderEasy\OrderEasy\bin\Debug\log4net.dll
+C:\Users\kcy\Desktop\RC Code\OrderEasy\OrderEasy\bin\Debug\MySql.Data.dll
+C:\Users\kcy\Desktop\RC Code\OrderEasy\OrderEasy\bin\Debug\NHibernate.ByteCode.Castle.dll
+C:\Users\kcy\Desktop\RC Code\OrderEasy\OrderEasy\bin\Debug\NHibernate.dll
+C:\Users\kcy\Desktop\RC Code\OrderEasy\OrderEasy\bin\Debug\nunit.framework.dll
+C:\Users\kcy\Desktop\RC Code\OrderEasy\OrderEasy\bin\Debug\protobuf-net.dll
+C:\Users\kcy\Desktop\RC Code\OrderEasy\OrderEasy\bin\Debug\SourceGrid.dll
+C:\Users\kcy\Desktop\RC Code\OrderEasy\OrderEasy\bin\Debug\Castle.Core.xml
+C:\Users\kcy\Desktop\RC Code\OrderEasy\OrderEasy\bin\Debug\Castle.DynamicProxy2.xml
+C:\Users\kcy\Desktop\RC Code\OrderEasy\OrderEasy\bin\Debug\Castle.MicroKernel.xml
+C:\Users\kcy\Desktop\RC Code\OrderEasy\OrderEasy\bin\Debug\Castle.Windsor.xml
+C:\Users\kcy\Desktop\RC Code\OrderEasy\OrderEasy\bin\Debug\Esent.Collections.xml
+C:\Users\kcy\Desktop\RC Code\OrderEasy\OrderEasy\bin\Debug\FluentNHibernate.xml
+C:\Users\kcy\Desktop\RC Code\OrderEasy\OrderEasy\bin\Debug\Iesi.Collections.xml
+C:\Users\kcy\Desktop\RC Code\OrderEasy\OrderEasy\bin\Debug\NHibernate.xml
+C:\Users\kcy\Desktop\RC Code\OrderEasy\OrderEasy\bin\Debug\NHibernate.ByteCode.Castle.xml
+C:\Users\kcy\Desktop\RC Code\OrderEasy\OrderEasy\obj\Debug\OrderEasy.csprojResolveAssemblyReference.cache
+C:\Users\kcy\Desktop\RC Code\OrderEasy\OrderEasy\obj\Debug\OrderEasy.OrderEasy.resources
+C:\Users\kcy\Desktop\RC Code\OrderEasy\OrderEasy\obj\Debug\ListViewEx.SubItemEventArgs.resources
+C:\Users\kcy\Desktop\RC Code\OrderEasy\OrderEasy\obj\Debug\OrderEasy.Properties.Resources.resources
+C:\Users\kcy\Desktop\RC Code\OrderEasy\OrderEasy\obj\Debug\OrderEasy.SetForm.resources
+C:\Users\kcy\Desktop\RC Code\OrderEasy\OrderEasy\obj\Debug\OrderEasy.csproj.GenerateResource.Cache

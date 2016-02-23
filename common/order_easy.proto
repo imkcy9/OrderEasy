@@ -1,0 +1,123 @@
+package order_easy;
+
+//dir
+//#define RC_ORDER_BUY '0'
+//#define RC_ORDER_SELL '1'
+
+//price_type
+//#define    RC_ORDER_LIMIT	0
+//#define    RC_ORDER_MARKET	1
+//#define    RC_ORDER_FAK	2
+//#define    RC_ORDER_FOK	3
+
+//message_type
+//#define OE_LOGIN_REQ 		 "OE_1" 
+//#define OE_LOGIN_RESP		 "OE_2"
+//#define OE_ORDER_REQ		 "OE_3"
+//#define OE_ORDER_RESP		 "OE_4"
+//#define OE_ORDER_RESP_ERR	 "OE_5"
+//#define OE_CANCEL_REQ		 "OE_6"
+//#define OE_CANCEL_RESP	 "OE_7"
+//#define OE_CANCEL_RESP_ERR     "OE_8"
+//#define OE_TRADE_RTN		 "OE_9"
+//#define OE_CANCEL_RTN		 "OE_10"
+//#define OE_POS_RTN		 "OE_11"
+//#define OE_MESSAGE_RTN	 "OE_12"
+//#define OE_DELET_RTN           "OE_13" 
+
+message login_req{
+    required string version = 1;
+    required string account = 2; //母帐号
+    required string symbol = 3;
+    required double symbol_tip = 4;
+}
+
+//登录应答
+message login_resp{
+    required string symbol = 1;
+    required int32 success =2;  //登录成功=0 
+    optional string ErrorMsg = 3;
+}
+
+//报单请求
+message order_req{
+    required int32 local_ref = 1;
+    required string symbol = 2;
+    required int32  price_type = 3;
+    required double price = 4;
+    required int32 vol =5;
+    required int32 dir =6;
+}
+
+//报单成功应答(已到达交易所)
+message order_resp{
+    required int32 local_ref = 1;
+    required int32 order_ref = 2;
+    required string tick_time = 3;
+}
+
+//报单错误应答(未到达交易所，不需要撤单)
+message order_resp_err{
+    required int32 local_ref = 1;
+    required string tick_time = 3;
+    required string error_msg = 4;
+}
+
+//撤单请求
+message cancel_req{
+    required int32 local_ref = 1;
+}
+
+//撤单应答(已到达交易所)
+message cancel_resp{
+    required int32 local_ref = 1;
+    required int32 order_ref = 2;
+    required string tick_time = 3;
+}
+
+//撤单错误应答(未到达交易所，需要再撤单)
+message cancel_resp_err{
+    required int32 local_ref = 1;
+    required int32 order_ref = 2;
+    required string tick_time = 3;
+    required string error_msg = 4;
+}
+
+/*
+//成交回报
+message trade_rtn{
+    required int32 local_ref = 1;
+    required int32 order_ref = 2;
+    required string tick_time = 3;
+    required double price = 4;
+    required int32 vol = 5;
+}
+
+//撤单回报
+message cancel_rtn{
+    required int32 local_ref = 1;
+    required int32 order_ref = 2;
+    required string tick_time = 3;
+    required int32 vol = 4;
+}
+*/
+
+//报单删除回报
+message delete_rtn{
+    required int32 local_ref = 1;
+    required string tick_time = 3;
+}
+
+//持仓回报
+message pos_rtn{
+    required string tick_time = 1;
+    required string symbol = 2;
+    required int32 dir = 3;
+    required int32 vol= 4;
+}
+
+//系统消息回报
+message message_rtn{
+    required string tick_time = 1;
+    required string msg = 2;
+}

@@ -1,0 +1,112 @@
+C:\Users\kcy\Desktop\RC Code\OrderEasy\OrderEasy\bin\Release\OrderEasy.exe.config
+C:\Users\kcy\Desktop\RC Code\OrderEasy\OrderEasy\bin\Release\OrderEasy.exe
+C:\Users\kcy\Desktop\RC Code\OrderEasy\OrderEasy\bin\Release\OrderEasy.pdb
+C:\Users\kcy\Desktop\RC Code\OrderEasy\OrderEasy\bin\Release\Antlr3.Runtime.dll
+C:\Users\kcy\Desktop\RC Code\OrderEasy\OrderEasy\bin\Release\Castle.Core.dll
+C:\Users\kcy\Desktop\RC Code\OrderEasy\OrderEasy\bin\Release\Castle.DynamicProxy2.dll
+C:\Users\kcy\Desktop\RC Code\OrderEasy\OrderEasy\bin\Release\Castle.MicroKernel.dll
+C:\Users\kcy\Desktop\RC Code\OrderEasy\OrderEasy\bin\Release\Castle.Windsor.dll
+C:\Users\kcy\Desktop\RC Code\OrderEasy\OrderEasy\bin\Release\clrzmq.dll
+C:\Users\kcy\Desktop\RC Code\OrderEasy\OrderEasy\bin\Release\Esent.Collections.dll
+C:\Users\kcy\Desktop\RC Code\OrderEasy\OrderEasy\bin\Release\Esent.Interop.dll
+C:\Users\kcy\Desktop\RC Code\OrderEasy\OrderEasy\bin\Release\FirebirdSql.Data.FirebirdClient.dll
+C:\Users\kcy\Desktop\RC Code\OrderEasy\OrderEasy\bin\Release\FluentNHibernate.dll
+C:\Users\kcy\Desktop\RC Code\OrderEasy\OrderEasy\bin\Release\Iesi.Collections.dll
+C:\Users\kcy\Desktop\RC Code\OrderEasy\OrderEasy\bin\Release\log4net.dll
+C:\Users\kcy\Desktop\RC Code\OrderEasy\OrderEasy\bin\Release\MySql.Data.dll
+C:\Users\kcy\Desktop\RC Code\OrderEasy\OrderEasy\bin\Release\NHibernate.ByteCode.Castle.dll
+C:\Users\kcy\Desktop\RC Code\OrderEasy\OrderEasy\bin\Release\NHibernate.dll
+C:\Users\kcy\Desktop\RC Code\OrderEasy\OrderEasy\bin\Release\nunit.framework.dll
+C:\Users\kcy\Desktop\RC Code\OrderEasy\OrderEasy\bin\Release\protobuf-net.dll
+C:\Users\kcy\Desktop\RC Code\OrderEasy\OrderEasy\bin\Release\SourceGrid.dll
+C:\Users\kcy\Desktop\RC Code\OrderEasy\OrderEasy\bin\Release\Castle.Core.xml
+C:\Users\kcy\Desktop\RC Code\OrderEasy\OrderEasy\bin\Release\Castle.DynamicProxy2.xml
+C:\Users\kcy\Desktop\RC Code\OrderEasy\OrderEasy\bin\Release\Castle.MicroKernel.xml
+C:\Users\kcy\Desktop\RC Code\OrderEasy\OrderEasy\bin\Release\Castle.Windsor.xml
+C:\Users\kcy\Desktop\RC Code\OrderEasy\OrderEasy\bin\Release\Esent.Collections.xml
+C:\Users\kcy\Desktop\RC Code\OrderEasy\OrderEasy\bin\Release\FluentNHibernate.xml
+C:\Users\kcy\Desktop\RC Code\OrderEasy\OrderEasy\bin\Release\Iesi.Collections.xml
+C:\Users\kcy\Desktop\RC Code\OrderEasy\OrderEasy\bin\Release\NHibernate.xml
+C:\Users\kcy\Desktop\RC Code\OrderEasy\OrderEasy\bin\Release\NHibernate.ByteCode.Castle.xml
+C:\Users\kcy\Desktop\RC Code\OrderEasy\OrderEasy\obj\x86\Release\OrderEasy.OrderEasy.resources
+C:\Users\kcy\Desktop\RC Code\OrderEasy\OrderEasy\obj\x86\Release\ListViewEx.SubItemEventArgs.resources
+C:\Users\kcy\Desktop\RC Code\OrderEasy\OrderEasy\obj\x86\Release\OrderEasy.Properties.Resources.resources
+C:\Users\kcy\Desktop\RC Code\OrderEasy\OrderEasy\obj\x86\Release\OrderEasy.SetForm.resources
+C:\Users\kcy\Desktop\RC Code\OrderEasy\OrderEasy\obj\x86\Release\OrderEasy.csproj.GenerateResource.Cache
+C:\Users\kcy\Desktop\RC Code\OrderEasy\OrderEasy\obj\x86\Release\OrderEasy.exe
+C:\Users\kcy\Desktop\RC Code\OrderEasy\OrderEasy\obj\x86\Release\OrderEasy.pdb
+D:\work\OrderEasy - 11.16\OrderEasy\bin\Release\OrderEasy.exe.config
+D:\work\OrderEasy - 11.16\OrderEasy\obj\x86\Release\OrderEasy.exe
+D:\work\OrderEasy - 11.16\OrderEasy\obj\x86\Release\OrderEasy.pdb
+D:\work\OrderEasy - 11.16\OrderEasy\bin\Release\OrderEasy.exe
+D:\work\OrderEasy - 11.16\OrderEasy\bin\Release\OrderEasy.pdb
+D:\work\OrderEasy - 11.16\OrderEasy\bin\Release\Antlr3.Runtime.dll
+D:\work\OrderEasy - 11.16\OrderEasy\bin\Release\Castle.Core.dll
+D:\work\OrderEasy - 11.16\OrderEasy\bin\Release\Castle.DynamicProxy2.dll
+D:\work\OrderEasy - 11.16\OrderEasy\bin\Release\Castle.MicroKernel.dll
+D:\work\OrderEasy - 11.16\OrderEasy\bin\Release\Castle.Windsor.dll
+D:\work\OrderEasy - 11.16\OrderEasy\bin\Release\clrzmq.dll
+D:\work\OrderEasy - 11.16\OrderEasy\bin\Release\Esent.Collections.dll
+D:\work\OrderEasy - 11.16\OrderEasy\bin\Release\Esent.Interop.dll
+D:\work\OrderEasy - 11.16\OrderEasy\bin\Release\FirebirdSql.Data.FirebirdClient.dll
+D:\work\OrderEasy - 11.16\OrderEasy\bin\Release\FluentNHibernate.dll
+D:\work\OrderEasy - 11.16\OrderEasy\bin\Release\Iesi.Collections.dll
+D:\work\OrderEasy - 11.16\OrderEasy\bin\Release\log4net.dll
+D:\work\OrderEasy - 11.16\OrderEasy\bin\Release\MySql.Data.dll
+D:\work\OrderEasy - 11.16\OrderEasy\bin\Release\NHibernate.ByteCode.Castle.dll
+D:\work\OrderEasy - 11.16\OrderEasy\bin\Release\NHibernate.dll
+D:\work\OrderEasy - 11.16\OrderEasy\bin\Release\nunit.framework.dll
+D:\work\OrderEasy - 11.16\OrderEasy\bin\Release\protobuf-net.dll
+D:\work\OrderEasy - 11.16\OrderEasy\bin\Release\SourceGrid.dll
+D:\work\OrderEasy - 11.16\OrderEasy\bin\Release\Castle.Core.xml
+D:\work\OrderEasy - 11.16\OrderEasy\bin\Release\Castle.DynamicProxy2.xml
+D:\work\OrderEasy - 11.16\OrderEasy\bin\Release\Castle.MicroKernel.xml
+D:\work\OrderEasy - 11.16\OrderEasy\bin\Release\Castle.Windsor.xml
+D:\work\OrderEasy - 11.16\OrderEasy\bin\Release\Esent.Collections.xml
+D:\work\OrderEasy - 11.16\OrderEasy\bin\Release\FluentNHibernate.xml
+D:\work\OrderEasy - 11.16\OrderEasy\bin\Release\Iesi.Collections.xml
+D:\work\OrderEasy - 11.16\OrderEasy\bin\Release\NHibernate.xml
+D:\work\OrderEasy - 11.16\OrderEasy\bin\Release\NHibernate.ByteCode.Castle.xml
+D:\work\OrderEasy - 11.16\OrderEasy\obj\x86\Release\OrderEasy.OrderEasy.resources
+D:\work\OrderEasy - 11.16\OrderEasy\obj\x86\Release\ListViewEx.SubItemEventArgs.resources
+D:\work\OrderEasy - 11.16\OrderEasy\obj\x86\Release\OrderEasy.Properties.Resources.resources
+D:\work\OrderEasy - 11.16\OrderEasy\obj\x86\Release\OrderEasy.SetForm.resources
+D:\work\OrderEasy - 11.16\OrderEasy\obj\x86\Release\OrderEasy.csproj.GenerateResource.Cache
+D:\work\OrderEasy - new\OrderEasy\bin\Release\OrderEasy.exe.config
+D:\work\OrderEasy - new\OrderEasy\obj\x86\Release\OrderEasy.exe
+D:\work\OrderEasy - new\OrderEasy\obj\x86\Release\OrderEasy.pdb
+D:\work\OrderEasy - new\OrderEasy\obj\x86\Release\OrderEasy.OrderEasy.resources
+D:\work\OrderEasy - new\OrderEasy\obj\x86\Release\ListViewEx.SubItemEventArgs.resources
+D:\work\OrderEasy - new\OrderEasy\obj\x86\Release\OrderEasy.Properties.Resources.resources
+D:\work\OrderEasy - new\OrderEasy\obj\x86\Release\OrderEasy.SetForm.resources
+D:\work\OrderEasy - new\OrderEasy\obj\x86\Release\OrderEasy.csproj.GenerateResource.Cache
+D:\work\OrderEasy - new\OrderEasy\bin\Release\OrderEasy.exe
+D:\work\OrderEasy - new\OrderEasy\bin\Release\OrderEasy.pdb
+D:\work\OrderEasy - new\OrderEasy\bin\Release\Antlr3.Runtime.dll
+D:\work\OrderEasy - new\OrderEasy\bin\Release\Castle.Core.dll
+D:\work\OrderEasy - new\OrderEasy\bin\Release\Castle.DynamicProxy2.dll
+D:\work\OrderEasy - new\OrderEasy\bin\Release\Castle.MicroKernel.dll
+D:\work\OrderEasy - new\OrderEasy\bin\Release\Castle.Windsor.dll
+D:\work\OrderEasy - new\OrderEasy\bin\Release\clrzmq.dll
+D:\work\OrderEasy - new\OrderEasy\bin\Release\Esent.Collections.dll
+D:\work\OrderEasy - new\OrderEasy\bin\Release\Esent.Interop.dll
+D:\work\OrderEasy - new\OrderEasy\bin\Release\FirebirdSql.Data.FirebirdClient.dll
+D:\work\OrderEasy - new\OrderEasy\bin\Release\FluentNHibernate.dll
+D:\work\OrderEasy - new\OrderEasy\bin\Release\Iesi.Collections.dll
+D:\work\OrderEasy - new\OrderEasy\bin\Release\log4net.dll
+D:\work\OrderEasy - new\OrderEasy\bin\Release\MySql.Data.dll
+D:\work\OrderEasy - new\OrderEasy\bin\Release\NHibernate.ByteCode.Castle.dll
+D:\work\OrderEasy - new\OrderEasy\bin\Release\NHibernate.dll
+D:\work\OrderEasy - new\OrderEasy\bin\Release\nunit.framework.dll
+D:\work\OrderEasy - new\OrderEasy\bin\Release\protobuf-net.dll
+D:\work\OrderEasy - new\OrderEasy\bin\Release\SourceGrid.dll
+D:\work\OrderEasy - new\OrderEasy\bin\Release\Castle.Core.xml
+D:\work\OrderEasy - new\OrderEasy\bin\Release\Castle.DynamicProxy2.xml
+D:\work\OrderEasy - new\OrderEasy\bin\Release\Castle.MicroKernel.xml
+D:\work\OrderEasy - new\OrderEasy\bin\Release\Castle.Windsor.xml
+D:\work\OrderEasy - new\OrderEasy\bin\Release\Esent.Collections.xml
+D:\work\OrderEasy - new\OrderEasy\bin\Release\FluentNHibernate.xml
+D:\work\OrderEasy - new\OrderEasy\bin\Release\Iesi.Collections.xml
+D:\work\OrderEasy - new\OrderEasy\bin\Release\NHibernate.xml
+D:\work\OrderEasy - new\OrderEasy\bin\Release\NHibernate.ByteCode.Castle.xml
+D:\work\OrderEasy - new\OrderEasy\obj\x86\Release\OrderEasy.LoginForm.resources
