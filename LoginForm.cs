@@ -12,6 +12,7 @@ using System.Threading;
 using order_easy;
 using ProtoBuf;
 using System.IO;
+using TraderControl;
 
 namespace OrderEasy
 {
@@ -75,6 +76,7 @@ namespace OrderEasy
             Thread testThread = new Thread((ThreadStart)delegate { ZMQControl.Instance().run(this,order_easy); });
             testThread.IsBackground = true;
             testThread.Start();
+            //testThread.Join();
         }
         private void LoginForm_Load(object sender, EventArgs e)
         {
@@ -90,10 +92,25 @@ namespace OrderEasy
             initZMQ();
             login();
 
-            login_resp d = new login_resp();
-            d.success = 0;
-            d.symbol = comb_Instrument.Text;
-            on_login_resp(d);
+            //login_resp d = new login_resp();
+            //d.success = 0;
+            //d.symbol = comb_Instrument.Text;
+            //d.last_local_ref = 10;
+            //d.long_pos = 4;
+            //d.short_pos = 5;
+            //for (int i = 0; i < 10; i++)
+            //{
+            //    order_record item = new order_record();
+            //    item.dir = i % 2 == 0 ? TradeType.direction.RC_ORDER_BUY : TradeType.direction.RC_ORDER_SELL;
+            //    item.local_ref = i;
+            //    item.order_ref = i + 10000;
+            //    item.price = i * this.current_tick + 36010;
+            //    item.price_type = TradeType.price_type.RC_ORDER_LIMIT;
+            //    item.symbol = "cu1604";
+            //    item.vol = 100 + i;
+            //    d.order_list.Add(item);
+            //}
+            //on_login_resp(d);
 
             //pos_rtn d2 = new pos_rtn();
             //d2.dir = 48;
@@ -112,13 +129,15 @@ namespace OrderEasy
                     MessageBox.Show("登陆失败：" + data.ErrorMsg);
                     return;
                 }
-                //if (data.symbol != )
-                //{
-                //    MessageBox.Show("登陆失败：服务器返回symbol与前端symbol不一致");
-                //    return;
-                //}
+                if (data.symbol != comb_Instrument.Text)
+                {
+                    MessageBox.Show("登陆失败：服务器返回symbol与前端symbol不一致");
+                    return;
+                }
+                //ZMQControl.Instance().heart_beat_timer_start();
                 order_easy.Show();
                 order_easy.start_sub_recv(comb_product.Text, comb_Instrument.Text);
+                order_easy.start_data_init(data);
                 this.Hide();
             });
         }

@@ -24,6 +24,19 @@ package order_easy;
 //#define OE_POS_RTN		 "OE_11"
 //#define OE_MESSAGE_RTN	 "OE_12"
 //#define OE_DELET_RTN           "OE_13" 
+//#define OE_HEARTBEAT           "OE_14" 
+//#define OE_FORCE_LOGOUT_RTN    "OE_15"
+
+//报单记录
+message order_record{
+    required int32 local_ref = 1;
+    required string symbol = 2;
+    required int32  price_type = 3;
+    required double price = 4;
+    required int32 vol =5;
+    required int32 dir =6;
+    required int32 order_ref = 7;
+}
 
 message login_req{
     required string version = 1;
@@ -35,8 +48,12 @@ message login_req{
 //登录应答
 message login_resp{
     required string symbol = 1;
-    required int32 success =2;  //登录成功=0 
-    optional string ErrorMsg = 3;
+    required int32 success = 2;  //登录成功=0 
+    required int32 last_local_ref =3; //最后本地报单号
+    required int32 long_pos =4;
+    required int32 short_pos =5;
+    repeated order_record order_list=6; //报单记录
+    optional string ErrorMsg = 7;
 }
 
 //报单请求
@@ -118,6 +135,12 @@ message pos_rtn{
 
 //系统消息回报
 message message_rtn{
+    required string tick_time = 1;
+    required string msg = 2;
+}
+
+//强制登出
+message force_logout_rtn{
     required string tick_time = 1;
     required string msg = 2;
 }

@@ -10,10 +10,12 @@ using ProtoBuf;
 using System.Threading;
 using RcXSpeedMdfPack;
 using order_easy;
+
 namespace OrderEasy.common
 {
     class ZMQControl
     {
+        private System.Windows.Forms.Timer heart_beat_timer;
         private MessageType msg_type = new MessageType();
         public static ZmqContext ctx = ZmqContext.Create();
         private ZmqSocket sktSub = null;
@@ -124,7 +126,6 @@ namespace OrderEasy.common
                 sktDealer.Identity = Encoding.UTF8.GetBytes(control_id);
                 sktDealer.Connect(addr);
                 isDealerInit = true;
-
             }
         }
         public Boolean Send2Router(OrderEasy_data data)
@@ -196,8 +197,8 @@ namespace OrderEasy.common
             //  Process messages from both sockets
             while (true)
             {
-                //poller.Poll(System.TimeSpan.FromMilliseconds(2000));
-                poller.Poll();
+                poller.Poll(System.TimeSpan.FromMilliseconds(2000));
+                //poller.Poll();
             }
         }
 
@@ -249,6 +250,7 @@ namespace OrderEasy.common
 
         void sktDealer_ReceiveReady(object sender, SocketEventArgs e)
         {
+
             string more = e.Socket.Receive(Encoding.UTF8);
             string msgtype = e.Socket.Receive(Encoding.UTF8);
 
@@ -257,98 +259,94 @@ namespace OrderEasy.common
 
             MemoryStream revParam = new MemoryStream(revBytes, 0, revSize);
             revParam.Seek(0, SeekOrigin.Begin);
-
-            if (msgtype == MessageType.OE_LOGIN_RESP)
-            {
-                login_resp data = new login_resp();
-                data = Serializer.Deserialize<login_resp>(revParam);
-                this.logForm.on_login_resp(data);
-                return;
-            }
-            if (msgtype == MessageType.OE_ORDER_RESP)
-            {
-                order_resp data = new order_resp();
-                data = Serializer.Deserialize<order_resp>(revParam);
-                this.sim.on_order_resp_handle(data);
-                return;
-            }
-            if (msgtype == MessageType.OE_ORDER_RESP_ERR)
-            {
-                order_resp_err data = new order_resp_err();
-                data = Serializer.Deserialize<order_resp_err>(revParam);
-                this.sim.on_order_resp_err_handle(data);
-                return;
-            }
-            if (msgtype == MessageType.OE_CANCEL_RESP)
-            {
-                cancel_resp data = new cancel_resp();
-                data = Serializer.Deserialize<cancel_resp>(revParam);
-                Program.log.Info("OE_CANCEL_RESP,local_ref;" + data.local_ref + " order_ref:" + data.order_ref);
-                return;
-            }
-            if (msgtype == MessageType.OE_CANCEL_RESP_ERR)
-            {
-                cancel_resp_err data = new cancel_resp_err();
-                data = Serializer.Deserialize<cancel_resp_err>(revParam);
-                this.sim.on_cancel_resp_err_handle(data);
-                return;
-            }
-            if (msgtype == MessageType.OE_DELET_RTN)
-            {
-                delete_rtn data = new delete_rtn();
-                data = Serializer.Deserialize<delete_rtn>(revParam);
-                this.sim.on_delete_rtn_handle(data);
-                return;
-            }
-            if (msgtype == MessageType.OE_POS_RTN)
-            {
-                pos_rtn data = new pos_rtn();
-                data = Serializer.Deserialize<pos_rtn>(revParam);
-                this.sim.on_pos_rtn_handle(data);
-                return;
-            }
-            if (msgtype == MessageType.OE_MESSAGE_RTN)
-            {
-
-                return;
-            }
-
-
-
-
-            OrderEasy_data respData = new OrderEasy_data();
-
             try
             {
-                respData = Serializer.Deserialize<OrderEasy_data>(revParam);
-                switch (respData.reqType)
+                if (msgtype == MessageType.OE_LOGIN_RESP)
                 {
-                    case OrderEasy_data.REQType.cancel:
-                    case OrderEasy_data.REQType.close:
-                        {
-
-                            this.sim.CancelRtnHandle(respData);
-                            break;
-                        }
-                    case OrderEasy_data.REQType.order:
-                        {
-                            this.sim.OrderRtnHandle(respData);
-                            break;
-                        }
-                    case OrderEasy_data.REQType.init:
-                        {
-                            this.sim.InitRtnHandle(respData);
-                            break;
-                        }
-                    default:
-                        {
-                            break;
-                        }
+                    login_resp data = new login_resp();
+                    data = Serializer.Deserialize<login_resp>(revParam);
+                    this.logForm.on_login_resp(data);
+                    return;
+                }
+                if (msgtype == MessageType.OE_ORDER_RESP)
+                {
+                    order_resp data = new order_resp();
+                    data = Serializer.Deserialize<order_resp>(revParam);
+                    this.sim.on_order_resp_handle(data);
+                    return;
+                }
+                if (msgtype == MessageType.OE_ORDER_RESP_ERR)
+                {
+                    order_resp_err data = new order_resp_err();
+                    data = Serializer.Deserialize<order_resp_err>(revParam);
+                    this.sim.on_order_resp_err_handle(data);
+                    return;
+                }
+                if (msgtype == MessageType.OE_CANCEL_RESP)
+                {
+                    cancel_resp data = new cancel_resp();
+                    data = Serializer.Deserialize<cancel_resp>(revParam);
+                    Program.log.Info("OE_CANCEL_RESP,local_ref;" + data.local_ref + " order_ref:" + data.order_ref);
+                    return;
+                }
+                if (msgtype == MessageType.OE_CANCEL_RESP_ERR)
+                {
+                    cancel_resp_err data = new cancel_resp_err();
+                    data = Serializer.Deserialize<cancel_resp_err>(revParam);
+                    this.sim.on_cancel_resp_err_handle(data);
+                    return;
+                }
+                if (msgtype == MessageType.OE_DELET_RTN)
+                {
+                    delete_rtn data = new delete_rtn();
+                    data = Serializer.Deserialize<delete_rtn>(revParam);
+                    this.sim.on_delete_rtn_handle(data);
+                    return;
+                }
+                if (msgtype == MessageType.OE_POS_RTN)
+                {
+                    pos_rtn data = new pos_rtn();
+                    data = Serializer.Deserialize<pos_rtn>(revParam);
+                    this.sim.on_pos_rtn_handle(data);
+                    return;
+                }
+                if (msgtype == MessageType.OE_MESSAGE_RTN)
+                {
+                    message_rtn data = new message_rtn();
+                    data = Serializer.Deserialize<message_rtn>(revParam);
+                    this.sim.on_message_rtn_handle(data);
+                    return;
+                }
+                if (msgtype == MessageType.OE_FORCE_LOGOUT_RTN)
+                {
+                    Program.log.Info("logout");
+                }
+                if (msgtype == MessageType.OE_HEARTBEAT)
+                {
+                    Program.log.Info("recv heartbeat");
                 }
             }
             catch (Exception ex)
             {
                 Program.log.Error(ex, ex);
+            }
+        }
+
+        public void heart_beat_timer_start()
+        {
+            heart_beat_timer = new System.Windows.Forms.Timer();
+            heart_beat_timer.Tick += new EventHandler(send_heart_beat);
+            heart_beat_timer.Enabled = true;
+            heart_beat_timer.Interval = 2000;
+        }
+
+        private void send_heart_beat(object sender, EventArgs e)
+        {
+            if (isDealerInit)
+            {
+                sktDealer.SendMore(control_id, Encoding.UTF8);
+                sktDealer.Send(MessageType.OE_HEARTBEAT, Encoding.UTF8);
+                Program.log.Debug("send_heart_beat");
             }
         }
     }

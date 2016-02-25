@@ -56,9 +56,10 @@ namespace OrderEasy
         private OrderEasy_data.Strategy strategy;
         private class Position
         {
-            public OrderEasy_data.PosStatus pos;
-            public int dir;
-            public int vol;
+            //public int dir;
+            //public int vol;
+            public int long_pos;
+            public int short_pos;
         }
 
         #region important parameter
@@ -76,7 +77,7 @@ namespace OrderEasy
         private Dictionary<string, string> priceSelButtonMap = new Dictionary<string, string>();
         /// 下单的guid与Price的对照表（1对1）
         /// </summary>
-        public BiDictionaryOneToOne<string, double> guidPriceMap = new BiDictionaryOneToOne<string, double>();
+        //public BiDictionaryOneToOne<string, double> guidPriceMap = new BiDictionaryOneToOne<string, double>();
         public BiDictionaryOneToOne<double, double> pairPriceMap = new BiDictionaryOneToOne<double, double>();
         public BiDictionaryOneToOne<int, double> refPriceMap = new BiDictionaryOneToOne<int, double>();
 
@@ -89,12 +90,14 @@ namespace OrderEasy
         /// 挂单列表：买
         /// </summary>
         private List<string> buyGuidList = new List<string>();
-        private List<int> buyRefList = new List<int>();
+        //private List<int> buyRefList = new List<int>();
+        private Dictionary<int, double> buyRefPriceMap = new Dictionary<int, double>();
         /// <summary>
         /// 挂单列表：卖
         /// </summary>
         private List<string> sellGuidList = new List<string>();
-        private List<int> sellRefList = new List<int>();
+        //private List<int> sellRefList = new List<int>();
+        private Dictionary<int, double> sellRefPriceMap = new Dictionary<int, double>();
         /// <summary>
         /// 当前挂单：MARKET的价格（买）
         /// </summary>
@@ -359,19 +362,19 @@ namespace OrderEasy
             grid1[26, 1].View = buttonView;
             grid1[26, 1].AddController(new CollapseClickEvent());
 
-            grid1[26, 2] = null;
-            //grid1[26, 2].View = buttonView;
+            grid1[26, 2] = new SourceGrid.Cells.Cell("L", typeof(string)); ;
+            grid1[26, 2].View = buttonView;
 
             //grid1[26, 2].AddController(new RevClickEvent());
 
 
-            grid1[26, 3] = new SourceGrid.Cells.Cell("FLAT", typeof(string));
+            grid1[26, 3] = new SourceGrid.Cells.Cell();
             grid1[26, 3].View = buttonView;
             //grid1[26, 3].AddController(new AllClickEvent());
 
-            grid1[26, 4] = new SourceGrid.Cells.Cell("强平", typeof(string));
+            grid1[26, 4] = new SourceGrid.Cells.Cell("S", typeof(string));
             grid1[26, 4].View = buttonView;
-            grid1[26, 4].AddController(new CloseClickEvent());
+            //grid1[26, 4].AddController(new CloseClickEvent());
 
             grid1[26, 5] = new SourceGrid.Cells.Cell(" C ", typeof(string));
             grid1[26, 5].View = buttonView;
@@ -391,9 +394,9 @@ namespace OrderEasy
 
             InitView();
             SetGrid1();
-            notClosePos.vol = 0;
-            this.radBtn1.Checked = true;
-            comboBox_strat.SelectedText = "<none>";
+            notClosePos.long_pos = notClosePos.short_pos = 0;
+            //this.radBtn1.Checked = true;
+            //comboBox_strat.SelectedText = "<none>";
             this.Height = 600;
 
         }
@@ -411,28 +414,6 @@ namespace OrderEasy
             price = Convert.ToDouble(p);
 
             return price;
-        }
-
-        private List<string> GetGuidListByPrice(double price)
-        {
-
-            List<string> guidList = new List<string>();
-            //int seqNo = f.seqNoPriceMap.FirstOrDefault(x => x.Value == price).Key;
-            string guid = "";
-            bool ret = guidPriceMap.TryGetBySecond(price, out guid);
-            if (!ret)
-            {
-
-                double maxPrice = 0;
-                ret = pairPriceMap.TryGetBySecond(price, out maxPrice);
-                if (ret)
-                    return GetGuidListByPrice(maxPrice);//
-                showErrorMsg("can't get guid by price:" + price);
-                return guidList;
-            }
-            guidList.Add(guid);
-            return guidList;
-
         }
 
         protected void SetFocus()
@@ -455,16 +436,6 @@ namespace OrderEasy
             //comb_Instrument.SelectedIndex = comb_Instrument.Items.IndexOf("");
             //comb_product.SelectedIndex = 0;
             //comb_Instrument.SelectedIndex = 0;
-            foreach (KeyValuePair<string, Future> pair in common.futureDic)
-            {
-                Future f = pair.Value;
-                if (f.isActive)
-                {
-                    comb_product.Items.Add(f.product);
-                }
-
-            }
-            comb_product.Items.Add("ST");
 
             this.comb_account.Items.Add(common.account);
             comb_account.SelectedIndex = comb_account.Items.IndexOf(common.account);
@@ -543,99 +514,7 @@ namespace OrderEasy
 
         }
 
-        private bool StratHandle(ref OrderEasy_data data)
-        {
 
-            return true;
-        }
-        private OrderEasy_data SetStratData(OrderEasy_data data)
-        {
-
-            //data.orderReq.orderType = OrderEasy_data.OrderType.strat;
-            OrderEasy_data.Strategy strate = new OrderEasy_data.Strategy();
-            strate.vol = Convert.ToInt32(numericQty1.Value);
-            if (data.orderReq.dir == OrderEasy_data.Direction.buy)
-            {
-
-                strate.maxPrice = data.orderReq.price + Convert.ToDouble(numProfitStop1.Value) * tickPoint;
-                strate.minPrice = data.orderReq.price - Convert.ToDouble(numStopLoss1.Value) * tickPoint;
-            }
-            else
-            {
-                strate.maxPrice = data.orderReq.price + Convert.ToDouble(numStopLoss1.Value) * tickPoint;
-                strate.minPrice = data.orderReq.price - Convert.ToDouble(numProfitStop1.Value) * tickPoint;
-            }
-            this.strategy = strate;
-            data.orderReq.strat.Add(strate);
-
-            return data;
-        }
-        //private void SetStratCancelBtns(OrderEasy_data data)
-        //{
-
-        //    int r = 0;
-        //    if (priceMap.TryGetValue(data.orderReq.strat[0].minPrice + "", out r))
-        //    {
-        //        if (r > 0)
-        //            SetStratCancelBtn(r, data.orderReq.dir, true);
-        //    }
-
-        //    if (priceMap.TryGetValue(data.orderReq.strat[0].maxPrice + "", out r))
-        //    {
-        //        if (r > 0)
-        //            SetStratCancelBtn(r, data.orderReq.dir, true);
-        //    }
-        //}
-        private bool OrderHandle(OrderEasy_data.Direction dir, double price, OrderEasy_data.OrderType orderType)
-        {
-            order_req data_req = new order_req();
-
-
-            //seqNo++;
-            OrderEasy_data data = new OrderEasy_data();
-            data.reqType = OrderEasy_data.REQType.order;
-            data.orderReq = new OrderEasy_data.OrderREQ();
-            data.orderReq.symbol = subTopic;
-            data.orderReq.orderType = orderType;
-            data.orderReq.guid = Convert.ToString(Guid.NewGuid());
-            data.orderReq.dir = dir;
-
-            data.orderReq.qty = Convert.ToInt32(txtOrderQty.Value);
-            data.orderReq.price = price;
-            if ("<Custom>".Equals(this.comboBox_strat.SelectedItem))
-            {
-                if (!CheckStrat())
-                {
-                    return false;
-                }
-                if (orderType == OrderEasy_data.OrderType.strat)
-                {
-                    data.orderReq.strat.Add(strategy);
-                    //SetStratCancelBtns(data);
-                    int stratVol = data.orderReq.strat[0].vol;
-                    data.orderReq.qty = notClosePos.vol > stratVol ? stratVol : notClosePos.vol;
-                    data.orderResp = new OrderEasy_data.OrderRESP();
-                    data.orderResp.e_x = OrderEasy_data.E_x.Exit;
-                }
-                else
-                {
-                    data = SetStratData(data);
-                }
-
-            }
-            if (!AddGuidPriceMap(data.orderReq.guid, price))
-                return false;
-
-            ZMQControl.Instance().Send2Router(data);
-
-            //priceSeqNoMap.Add(price, seqNo);
-            if (dir == OrderEasy_data.Direction.buy)
-                buyGuidList.Add(data.orderReq.guid);
-            else
-                sellGuidList.Add(data.orderReq.guid);
-            return true;
-
-        }
         private bool OrderHandle(int direction, double price, int price_type)
         {
             order_req data = new order_req();
@@ -650,84 +529,16 @@ namespace OrderEasy
             sParam.Seek(0, SeekOrigin.Begin);
             Serializer.Serialize<order_req>(sParam, data);
 
-            if(!AddRefPriceMap(data.local_ref,price))
-                return false;
+            //if(!AddRefPriceMap(data.local_ref,price))
+            //    return false;
             ZMQControl.Instance().Send2Router(sParam, MessageType.OE_ORDER_REQ);
             if (direction == TradeType.direction.RC_ORDER_BUY)
-                buyRefList.Add(data.local_ref);
+                //buyRefList.Add(data.local_ref);
+                buyRefPriceMap.Add(data.local_ref, price);
             else
-                sellRefList.Add(data.local_ref);
+                //sellRefList.Add(data.local_ref);
+                sellRefPriceMap.Add(data.local_ref, price);
             return true;
-        }
-        private bool CheckStrat()
-        {
-            if (numStopLoss1.Value <= 0)
-            {
-                MessageBox.Show("止损参数错误设置：" + numStopLoss1.Value);
-                return false;
-            }
-            if (numProfitStop1.Value <= 0)
-            {
-                MessageBox.Show("止赢参数错误设置：" + numProfitStop1.Value);
-                return false;
-            }
-
-
-            return true;
-        }
-
-        private void DealForeCloseHandle(List<string> guids, OrderEasy_data.CancelType cType, OrderEasy_data.Direction dir)
-        {
-            OrderEasy_data data = new OrderEasy_data();
-
-            data.cancelReq = new OrderEasy_data.CancelREQ();
-            data.cancelReq.cancelType = cType;
-
-            data.reqType = OrderEasy_data.REQType.close;
-            data.orderReq = new OrderEasy_data.OrderREQ();
-            data.orderReq.symbol = subTopic;
-            data.orderReq.orderType = OrderEasy_data.OrderType.market;
-            data.orderReq.guid = Convert.ToString(Guid.NewGuid());
-
-            if (notClosePos.pos == OrderEasy_data.PosStatus.Long)
-            {
-                data.orderReq.dir = OrderEasy_data.Direction.sell;
-                //sellGuidList.Add(data.orderReq.guid);
-            }
-            else
-            {
-                data.orderReq.dir = OrderEasy_data.Direction.buy;
-                //buyGuidList.Add(data.orderReq.guid);
-            }
-
-            data.orderReq.qty = notClosePos.vol;
-
-            foreach (string guid in guids)
-            {
-                data.cancelReq.guid.Add(guid);
-            }
-
-            data.cancelReq.symbol = subTopic;
-            data.cancelReq.dir = dir;
-            ZMQControl.Instance().Send2Router(data);
-        }
-
-        private void CacelHandle(List<string> guids, OrderEasy_data.CancelType cType, OrderEasy_data.Direction dir)
-        {
-
-            OrderEasy_data data = new OrderEasy_data();
-            data.reqType = OrderEasy_data.REQType.cancel;
-            data.cancelReq = new OrderEasy_data.CancelREQ();
-            data.cancelReq.cancelType = cType;
-
-            foreach (string guid in guids)
-            {
-                data.cancelReq.guid.Add(guid);
-            }
-
-            data.cancelReq.symbol = subTopic;
-            data.cancelReq.dir = dir;
-            ZMQControl.Instance().Send2Router(data);
         }
 
         private void CacelHandle(int local_ref)
@@ -752,7 +563,7 @@ namespace OrderEasy
             {
                 guidList.Add(guid);
             }
-            DealForeCloseHandle(guidList, OrderEasy_data.CancelType.cancelAll, OrderEasy_data.Direction.buy);
+            //DealForeCloseHandle(guidList, OrderEasy_data.CancelType.cancelAll, OrderEasy_data.Direction.buy);
 
             //if (notClosePos.vol > 0)
             //{
@@ -768,42 +579,24 @@ namespace OrderEasy
             //    }
             //}
         }
-        private void RevHandle()
-        {
+        //private void RevHandle()
+        //{
 
-            if (notClosePos.vol > 0)
-            {
-                if (notClosePos.pos == OrderEasy_data.PosStatus.Long)
-                {
-                    OrderHandle(OrderEasy_data.Direction.sell, curTicker.bid, OrderEasy_data.OrderType.rev);
-                }
-                else
-                {
-                    OrderHandle(OrderEasy_data.Direction.buy, curTicker.ask, OrderEasy_data.OrderType.rev);
-                }
-            }
-        }
+        //    if (notClosePos.vol > 0)
+        //    {
+        //        if (notClosePos.pos == OrderEasy_data.PosStatus.Long)
+        //        {
+        //            //OrderHandle(OrderEasy_data.Direction.sell, curTicker.bid, OrderEasy_data.OrderType.rev);
+        //        }
+        //        else
+        //        {
+        //            //OrderHandle(OrderEasy_data.Direction.buy, curTicker.ask, OrderEasy_data.OrderType.rev);
+        //        }
+        //    }
+        //}
 
 
         #region ServiceRtnHandle
-
-
-        public void InitRtnHandle(OrderEasy_data data)
-        {
-            Invoke((MethodInvoker)delegate
-            {
-                InitRtn(data);
-            });
-        }
-        public void OrderRtnHandle(OrderEasy_data data)
-        {
-            Invoke((MethodInvoker)delegate
-            {
-                OrderRtn(data);
-
-
-            });
-        }
         public void on_order_resp_handle(order_resp data)
         {
             Invoke((MethodInvoker)delegate
@@ -838,8 +631,10 @@ namespace OrderEasy
             {
                 if (data.symbol == subTopic)
                 {
-                    notClosePos.vol = data.vol;
-                    notClosePos.dir = data.dir;
+                    if (data.dir == TradeType.direction.RC_ORDER_BUY)
+                        notClosePos.long_pos = data.vol;
+                    else if (data.dir == TradeType.direction.RC_ORDER_SELL)
+                        notClosePos.short_pos = data.vol;
                     SetFLAT();
                 }
             });
@@ -849,64 +644,101 @@ namespace OrderEasy
         {
             Invoke((MethodInvoker)delegate
             {
-                showErrorMsg(data.msg);
+                Program.log.Info(data.msg);
+                string msg = data.msg + "\n" + richTextBox1.Text;
+                richTextBox1.Text = msg;
             });
         }
         public void on_delete_rtn_handle(delete_rtn data)
         {
             Invoke((MethodInvoker)delegate
             {
+
                 int r = -1;
                 double price = -1;
-                bool ret = refPriceMap.TryGetByFirst(data.local_ref, out price);
-                if (!ret)
-                    return;
+
+                foreach (KeyValuePair<int, double> pair in buyRefPriceMap)
+                {
+                    if (pair.Key == data.local_ref)
+                    {
+                        price = pair.Value;
+                    }
+                }
+                foreach (KeyValuePair<int, double> pair in sellRefPriceMap)
+                {
+                    if (pair.Key == data.local_ref)
+                    {
+                        price = pair.Value;
+                    }
+                }
 
                 if (!priceMap.TryGetValue(FormatPrice(price), out r))
                 {
-                    if(buyRefList.Contains(data.local_ref))
-                        buyRefList.Remove(data.local_ref);
-                    if(sellRefList.Contains(data.local_ref))
-                        sellRefList.Remove(data.local_ref);
+                    if (buyRefPriceMap.ContainsKey(data.local_ref))
+                        buyRefPriceMap.Remove(data.local_ref);
+                    if (sellRefPriceMap.ContainsKey(data.local_ref))
+                        sellRefPriceMap.Remove(data.local_ref);
                     repRefList.Remove(data.local_ref);
                     return;
                 }
-                if (buyRefList.Contains(data.local_ref))
+                if (buyRefPriceMap.ContainsKey(data.local_ref))
                 {
-                    buyRefList.Remove(data.local_ref);
+                    buyRefPriceMap.Remove(data.local_ref);
                     repRefList.Remove(data.local_ref);
                     SetCancelButton(r, TradeType.direction.RC_ORDER_BUY, false, "0");
                 }
                 else
                 {
-                    sellRefList.Remove(data.local_ref);
+                    sellRefPriceMap.Remove(data.local_ref);
                     repRefList.Remove(data.local_ref);
                     SetCancelButton(r, TradeType.direction.RC_ORDER_SELL, false, "0");
                 }
-
-
-                RemoveRefPriceMap(data.local_ref);
             });
            
         }
 
         private void on_order_resp(order_resp data)
         {
-            double price = 0;
-            if (!refPriceMap.TryGetByFirst(data.local_ref, out price))
+            if (!buyRefPriceMap.ContainsKey(data.local_ref) && !sellRefPriceMap.ContainsKey(data.local_ref))
             {
                 showErrorMsg("there havn't fund price by rev seqno:" + data.local_ref);
                 return;
             }
+            //if (!refPriceMap.TryGetByFirst(data.local_ref, out price))
+            //{
+            //    showErrorMsg("there havn't fund price by rev seqno:" + data.local_ref);
+            //    return;
+            //}
             int r = -1;
-            if (!priceMap.TryGetValue(FormatPrice(price), out r))
+            double price = -1;
+            foreach (KeyValuePair<int, double> pair in buyRefPriceMap)
+            {
+                if (pair.Key == data.local_ref)
+                {
+                    price = pair.Value;
+                    break;
+                }
+            }
+            foreach (KeyValuePair<int, double> pair in sellRefPriceMap)
+            {
+                if (pair.Key == data.local_ref)
+                {
+                    price = pair.Value;
+                    break;
+                }
+            }
+
+            string sPrice = FormatPrice(price);
+            if (!priceMap.TryGetValue(sPrice, out r))
                 return;
-            if (buyRefList.Contains(data.local_ref))
+            //if (buyRefList.Contains(data.local_ref))
+            if(buyRefPriceMap.ContainsKey(data.local_ref))
             {
                 grid1[r, 1].View = GreenView;
                 repRefList.Add(data.local_ref);
             }
-            else if (sellRefList.Contains(data.local_ref))
+            //else if (sellRefList.Contains(data.local_ref))
+            else if(sellRefPriceMap.ContainsKey(data.local_ref))
             {
                 if (grid1[r, 5] == null)
                 {
@@ -922,13 +754,7 @@ namespace OrderEasy
             }
             grid1.Refresh();
         }
-        public void CancelRtnHandle(OrderEasy_data data)
-        {
-            Invoke((MethodInvoker)delegate
-            {
-                CancelRtn(data);
-            });
-        }
+
         public void TickerRevHandle(MdfTicker ticker)
         {
             Invoke((MethodInvoker)delegate
@@ -980,163 +806,7 @@ namespace OrderEasy
             //grid1[stopR, 3].View = GreenView;
             //grid1[stopR, 4].View = GreenView;
         }
-        private void OrderRtnImp(OrderEasy_data data, int r, double price)
-        {
 
-            if (!priceMap.TryGetValue(FormatPrice(price), out r))
-            {
-                return;
-            }
-            if (data.orderReq.orderType == OrderEasy_data.OrderType.market)
-            {
-                r = 24;
-            }
-            if (data.orderReq.dir == OrderEasy_data.Direction.buy)
-            {
-                //
-                grid1[r, 1].View = GreenView;
-                repGuidList.Add(data.orderReq.guid);
-                if (data.orderReq.orderType == OrderEasy_data.OrderType.strat
-                    && data.orderResp.e_x == OrderEasy_data.E_x.Exit)
-                {//自动平仓策略开起
-                    OrderEasy_data.Strategy strat = data.orderReq.strat[0];
-                    SetStopView(RedView, 1, strat.maxPrice);
-                    SetStopView(GreenView, 1, strat.minPrice);
-                }
-
-            }
-            else
-            {
-                if (grid1[r, 5] == null)
-                {
-                    grid1[r, 5] = new SourceGrid.Cells.Cell("×", typeof(string));
-                    grid1[r, 5].View = delView;
-                    grid1[r, 5].AddController(new CancelClickEvent());
-                }
-
-                //grid1[r, 5].View = GreenView;
-                if (data.orderReq.orderType == OrderEasy_data.OrderType.strat
-                    && data.orderResp.e_x == OrderEasy_data.E_x.Exit)
-                {//自动平仓策略开起
-                    OrderEasy_data.Strategy strat = data.orderReq.strat[0];
-                    SetStopView(GreenView, 2, strat.maxPrice);
-                    SetStopView(RedView, 2, strat.minPrice);
-                }
-
-            }
-            grid1.Refresh();
-            return;
-        }
-        private void TradeRtnHandle(OrderEasy_data data, int r, double price, int dir)
-        {
-
-            if (!priceMap.TryGetValue(FormatPrice(price), out r))
-            {
-                buyGuidList.Remove(data.orderReq.guid);
-                repGuidList.Remove(data.orderReq.guid);
-                return;
-            }
-            if (data.orderReq.orderType == OrderEasy_data.OrderType.market)
-            {
-                r = 24;
-                if (dir == TradeType.direction.RC_ORDER_BUY)
-                    marketBuyPrice = 0;
-                else
-                    marketSellPrice = 0;
-            }
-            if (data.orderReq.strat.Count > 0 && data.orderResp.ErrorID == 0)
-            {
-                TradeStratHandle(data);
-            }
-            if (data.orderReq.qty > 0)//部分成交
-            {
-                //SetLeftVol(data);
-                int c = dir == TradeType.direction.RC_ORDER_BUY ? 1 : 5;
-                grid1[r, c].Value = data.orderReq.qty;
-                grid1.Refresh();
-                if (data.orderResp.ErrorID == 0)
-                    return;
-            }
-            if (dir == TradeType.direction.RC_ORDER_BUY)
-            {
-                buyGuidList.Remove(data.orderReq.guid);
-                repGuidList.Remove(data.orderReq.guid);
-            }
-            else
-                sellGuidList.Remove(data.orderReq.guid);
-
-            SetCancelButton(r, dir, false, data.orderReq.qty.ToString());
-            RemoveGuidPriceMap(data.orderReq.guid);
-        }
-        /// <summary>
-        /// 处理自动平仓策略
-        /// </summary>
-        /// <param name="data"></param>
-        private void TradeStratHandle(OrderEasy_data data)
-        {
-
-            if (data.orderReq.qty > 0)//部分成交
-            {
-                //if (data.orderResp.e_x == OrderEasy_data.E_x.Entry)
-                //return;
-
-            }
-            if (data.orderResp.e_x == OrderEasy_data.E_x.Entry)
-            {
-                SendStratOrder(data);//通知后台开起自动平仓策略
-            }
-            else if (data.orderResp.e_x == OrderEasy_data.E_x.Exit)
-            {
-                //自动平仓完成
-                CancelStratBtn(strategy.minPrice, data.orderReq.dir);
-                CancelStratBtn(strategy.maxPrice, data.orderReq.dir);
-            }
-        }
-        private void CancelStratBtn(double price, OrderEasy_data.Direction dir)
-        {
-            int r = 0;
-            if (priceMap.TryGetValue(price + "", out r))
-            {
-                if (r > 0)
-                {
-                    //SetStratCancelBtn(r, dir, false);
-                }
-            }
-        }
-        //private void TradeRtn(OrderEasy_data data, int r, double price)
-        //{
-
-        //    notClosePos.vol = data.orderResp.notCloseVol;
-        //    notClosePos.pos = data.orderResp.pos;
-        //    SetFLAT();
-        //    TradeRtnHandle(data, r, price, data.orderReq.dir);
-
-        //}
-        private void OrderRtn(OrderEasy_data data)
-        {
-            if (data.orderResp.ErrorID != 0)//return error
-            {
-
-                ErrorHanle(data);
-                //return;
-            }
-            double price = 0;
-            if (!guidPriceMap.TryGetByFirst(data.orderReq.guid, out price))
-            {
-                showErrorMsg("there havn't fund price by rev seqno:" + data.orderReq.guid);
-                return;
-            }
-            int r = -1;
-            if (data.orderResp.ErrorMsg == "")//return Immediately
-            {
-                OrderRtnImp(data, r, price);
-            }
-            else//成交回报
-            {
-                //TradeRtn(data, r, price);
-            }
-            grid1.Refresh();
-        }
         private void SetStratCancelBtn(int r, int dir, bool visable)
         {
             if (r <= 0)
@@ -1306,141 +976,30 @@ namespace OrderEasy
         }
         private void SetFLAT()
         {
-            if (notClosePos.vol == 0)
+            if (notClosePos.long_pos > 0)
             {
-                grid1[26, 3].Value = "FLAT";
-                grid1[26, 3].View = buttonView;
+                grid1[26, 2].Value = notClosePos.long_pos + "L"; ;
+                grid1[26, 2].View = GreenView;
             }
             else
             {
-                string posStr = notClosePos.dir == TradeType.direction.RC_ORDER_BUY ? "L" : "S";
-                grid1[26, 3].Value = notClosePos.vol + posStr;
-                grid1[26, 3].View = notClosePos.dir == TradeType.direction.RC_ORDER_BUY ? GreenView : RedView;
-            }
-            grid1.Refresh();
-        }
-        private void CancelRtn(OrderEasy_data data)
-        {
-            double price = 0;
-            if (data.cancelResp.ErrorID != 0)//return error
-            {
-
-                showErrorMsg("ErrorID:" + data.cancelResp.ErrorID + "|msg:" + data.cancelResp.ErrorMsg);
-
-                return;
-            }
-            if (!guidPriceMap.TryGetByFirst(data.cancelResp.guid, out price))
-            {
-                showErrorMsg("there havn't fund price by rev seqno:" + data.cancelResp.guid);
-                return;
-            }
-            int r = -1;
-            if (data.cancelReq.cancelType == OrderEasy_data.CancelType.cancelMarket || data.orderReq.orderType == OrderEasy_data.OrderType.market)
-            {
-                r = 24;
-            }
-            else if (!priceMap.TryGetValue(FormatPrice(price), out r))
-            {
-                return;
+                grid1[26, 2].Value = "L";
+                grid1[26, 2].View = buttonView;
             }
 
-            if (data.cancelResp.ErrorMsg == "")//return Immediately
+            if (notClosePos.short_pos > 0)
             {
-                return;
+                grid1[26, 4].Value = notClosePos.short_pos + "S"; 
+                grid1[26, 4].View = RedView;
             }
-            else//撤单回报
+            else
             {
-
-                notClosePos.vol = data.cancelResp.notCloseVol;
-                notClosePos.pos = data.cancelResp.pos;
-                SetFLAT();
-                if (data.reqType != OrderEasy_data.REQType.close)
-                {
-                    DealCanselOrder(data, r);
-                }
-                else
-                    if (data.reqType == OrderEasy_data.REQType.close)
-                    {
-                        DealCanselOrder(data, r);
-                        OrderEasy_data data_close = new OrderEasy_data();
-                        data_close.reqType = OrderEasy_data.REQType.order;
-                        data_close.orderReq = new OrderEasy_data.OrderREQ();
-                        data_close.orderReq.symbol = subTopic;
-                        data_close.orderReq.orderType = data.orderReq.orderType;
-                        data_close.orderReq.guid = data.orderReq.guid;
-                        data_close.orderReq.dir = data.orderReq.dir;
-
-                        data_close.orderReq.qty = data.orderReq.qty;
-                        data_close.orderReq.price = data.orderReq.price;
-                        if (!AddGuidPriceMap(data.orderReq.guid, data_close.orderReq.price))
-                            return;
-
-                        if (data.orderReq.dir == OrderEasy_data.Direction.buy)
-                            buyGuidList.Add(data.orderReq.guid);
-                        else
-                            sellGuidList.Add(data.orderReq.guid);
-
-                        if (!priceMap.TryGetValue(FormatPrice(data.orderReq.price), out r))
-                        {
-                            return;
-                        }
-                        //SetCancelButton(r, data.orderReq.dir, true, data.orderReq.qty.ToString());
-
-                    }
-
-
+                grid1[26, 4].Value = "S";
+                grid1[26, 4].View = buttonView;
             }
             grid1.Refresh();
         }
 
-        private void DealCanselOrder(OrderEasy_data data, int gridRowIndex)
-        {
-            int r = gridRowIndex;
-            if (data.orderReq.dir == OrderEasy_data.Direction.buy)
-            {
-                grid1[r, 0] = null;
-                grid1[r, 1] = null;
-                if (data.cancelReq.cancelType == OrderEasy_data.CancelType.cancelMarket)
-                {
-                    marketBuyPrice = 0;
-                }
-                buyGuidList.Remove(data.orderReq.guid);
-                repGuidList.Remove(data.orderReq.guid);
-                priceBuyButtonMap.Remove(FormatPrice( data.orderReq.price));
-                //SetCancelButton(r, OrderEasy_data.Direction.buy, false, data.orderReq.qty.ToString());
-                grid1.Refresh();
-
-
-            }
-            else if (data.orderReq.dir == OrderEasy_data.Direction.sell)
-            {
-                grid1[r, 5] = null;
-                grid1[r, 6] = null;
-                if (data.orderReq.orderType == OrderEasy_data.OrderType.market)
-                {
-                    marketSellPrice = 0;
-                }
-                sellGuidList.Remove(data.orderReq.guid);
-                priceSelButtonMap.Remove(FormatPrice(data.orderReq.price));
-                //SetCancelButton(r, OrderEasy_data.Direction.sell, false, data.orderReq.qty.ToString());
-                grid1.Refresh();
-                //RemoveGuidPriceMap(data.orderReq.guid);
-
-            }
-            RemoveGuidPriceMap(data.orderReq.guid);
-
-        }
-
-        private void RemoveGuidPriceMap(string guid)
-        {
-            double maxPrice = 0;
-            guidPriceMap.TryGetByFirst(guid, out maxPrice);
-            if (!guidPriceMap.TryRemoveByFirst(guid))
-            {
-                showErrorMsg("guidPriceMap remove fail!,guid=" + guid);
-            }
-            pairPriceMap.TryRemoveByFirst(maxPrice);
-        }
         private void RemoveRefPriceMap(int local_ref)
         {
             double maxPrice = 0;
@@ -1712,10 +1271,27 @@ namespace OrderEasy
                 }
                 grid1[24, 4].View = cellView;
             }
-            string guid = "";
             int local_ref = -1;
-            bool ret = refPriceMap.TryGetBySecond(Convert.ToDouble(price), out local_ref);//guidPriceMap.TryGetBySecond(Convert.ToDouble(price), out guid);
-            bool retBuy = repRefList.Contains(local_ref); //repGuidList.Contains(guid);
+            bool ret = false; //= refPriceMap.TryGetBySecond(Convert.ToDouble(price), out local_ref);//guidPriceMap.TryGetBySecond(Convert.ToDouble(price), out guid);
+
+            foreach (KeyValuePair<int, double> pair in buyRefPriceMap)
+            {
+                if (pair.Value.ToString() == price)
+                {
+                    local_ref = pair.Key;
+                    ret = true;
+                }
+            }
+            foreach (KeyValuePair<int, double> pair in sellRefPriceMap)
+            {
+                if (pair.Value.ToString() == price)
+                {
+                    local_ref = pair.Key;
+                    ret = true;
+                }
+            }
+            bool retBuy = repRefList.Contains(local_ref); 
+
               if (priceBuyButtonMap.ContainsKey(price))
                 {
                     //setbutton
@@ -1944,20 +1520,20 @@ namespace OrderEasy
                 base.OnClick(sender, e);
 
                 //自动平仓策略，暂时没用到
-                //SourceGrid.Grid grid = (SourceGrid.Grid)sender.Grid;
-                //OrderEasy f = (OrderEasy)grid.Parent.Parent;
-                //f.groupBox2.Visible = !f.groupBox2.Visible;
-                //if (f.groupBox2.Visible)
-                //{
-                //    f.grid1[26, 1].Value = ">";
-                //    f.Height = 735;
-                //}
-                //else
-                //{
-                //    f.grid1[26, 1].Value = "<";
-                //    f.Height = 600;
-                //}
-                //f.SetFocus();
+                SourceGrid.Grid grid = (SourceGrid.Grid)sender.Grid;
+                OrderEasy f = (OrderEasy)grid.Parent.Parent;
+                f.groupBox2.Visible = !f.groupBox2.Visible;
+                if (f.groupBox2.Visible)
+                {
+                    f.grid1[26, 1].Value = ">";
+                    f.Height = 711;
+                }
+                else
+                {
+                    f.grid1[26, 1].Value = "<";
+                    f.Height = 600;
+                }
+                f.SetFocus();
 
             }
         }
@@ -1970,23 +1546,24 @@ namespace OrderEasy
                 SourceGrid.Grid grid = (SourceGrid.Grid)sender.Grid;
                 OrderEasy f = (OrderEasy)grid.Parent.Parent;
                 f.SetFocus();
-                f.RevHandle();
+                //f.RevHandle();
 
             }
         }
         private void InitVolHandle()
         {
-            string showMsg = "清空所有的交易信息 并且初始化后台? \r\n\n ";
-            DialogResult result = MessageBox.Show(showMsg, "初始化 确认", MessageBoxButtons.YesNo);
-            if (result == DialogResult.No)
-            {
-                return;
-            }
-            wirteDebugMsg("send Init req");
-            ClearData();
-            SetCancelButton2NULL(OrderEasy_data.Direction.buy);
-            SetCancelButton2NULL(OrderEasy_data.Direction.sell);
-            ResetPrice();
+            showErrorMsg("未实现的功能【初始化】");
+            //string showMsg = "清空所有的交易信息 并且初始化后台? \r\n\n ";
+            //DialogResult result = MessageBox.Show(showMsg, "初始化 确认", MessageBoxButtons.YesNo);
+            //if (result == DialogResult.No)
+            //{
+            //    return;
+            //}
+            //wirteDebugMsg("send Init req");
+            //ClearData();
+            //SetCancelButton2NULL(OrderEasy_data.Direction.buy);
+            //SetCancelButton2NULL(OrderEasy_data.Direction.sell);
+            //ResetPrice();
         }
         private void BuyClinkHandle(int r)
         {
@@ -2021,40 +1598,7 @@ namespace OrderEasy
             if (OrderHandle(TradeType.direction.RC_ORDER_SELL, price, TradeType.price_type.RC_ORDER_LIMIT))
                 SetCancelButton(r, TradeType.direction.RC_ORDER_SELL, true, txtOrderQty.Value.ToString());
         }
-        private void MarketBuyClinkHandle(int r)
-        {
 
-            string showMsg = "     Buy market "
-                + txtOrderQty.Value + " contract(s) " + subTopic + "\r\n\r\n";
-            DialogResult result = MessageBox.Show(showMsg, "确定订单", MessageBoxButtons.YesNo);
-            if (result == DialogResult.No)
-            {
-                return;
-            }
-            marketBuyPrice = curTicker.ask;
-            if (OrderHandle(OrderEasy_data.Direction.buy, marketBuyPrice, OrderEasy_data.OrderType.market))
-            {
-                //SetCancelButton(r, OrderEasy_data.Direction.buy, true, txtOrderQty.Value.ToString());
-
-            }
-        }
-        private void MarketSellClinkHandle(int r)
-        {
-
-            string showMsg = "   Sell market "
-                + txtOrderQty.Value + " contract(s) " + subTopic + "\r\n\r\n";
-            DialogResult result = MessageBox.Show(showMsg, "确定订单", MessageBoxButtons.YesNo);
-            if (result == DialogResult.No)
-            {
-                return;
-            }
-            marketSellPrice = curTicker.bid;
-            if (OrderHandle(OrderEasy_data.Direction.sell, marketSellPrice, OrderEasy_data.OrderType.market))
-            {
-                //SetCancelButton(r, OrderEasy_data.Direction.sell, true, txtOrderQty.Value.ToString());
-
-            }
-        }
         private void LockButtonHandle()
         {
             isLock = !isLock;
@@ -2105,10 +1649,10 @@ namespace OrderEasy
                 }
                 else if (r == 24)//MARKET
                 {
-                    if (c == 2)
-                        f.MarketBuyClinkHandle(r);
-                    else if (c == 4)
-                        f.MarketSellClinkHandle(r);
+                    //if (c == 2)
+                        //f.MarketBuyClinkHandle(r);
+                    //else if (c == 4)
+                        //f.MarketSellClinkHandle(r);
                 }
 
                 //Thread.Sleep(10000);
@@ -2157,9 +1701,26 @@ namespace OrderEasy
                 else
                 {//cancel ONE
                     int local_ref = -1;
-                    if (f.refPriceMap.TryGetBySecond(f.GetPriceByIndex(r), out local_ref))
-                        f.CacelHandle(local_ref);
-                    else
+                    foreach (KeyValuePair<int, double> pair in f.buyRefPriceMap)
+                    {
+                        if (pair.Value == Convert.ToDouble(f.GetPriceByIndex(r)) && dir == TradeType.direction.RC_ORDER_BUY)
+                        {
+                            local_ref = pair.Key;
+                            f.CacelHandle(local_ref);
+                            return;
+                        }
+                    }
+                    foreach (KeyValuePair<int, double> pair in f.sellRefPriceMap)
+                    {
+                        if (pair.Value == Convert.ToDouble(f.GetPriceByIndex(r)) && dir == TradeType.direction.RC_ORDER_SELL)
+                        {
+                            local_ref = pair.Key;
+                            f.CacelHandle(local_ref);
+                            return;
+                        }
+                    }
+
+                    if(local_ref == -1)
                         f.showErrorMsg("未找到对应local_ref");
                 }
 
@@ -2173,11 +1734,13 @@ namespace OrderEasy
             public override void OnClick(SourceGrid.CellContext sender, EventArgs e)
             {
                 base.OnClick(sender, e);
-
                 SourceGrid.Grid grid = (SourceGrid.Grid)sender.Grid;
                 OrderEasy f = (OrderEasy)grid.Parent.Parent;
-                f.SetFocus();
-                f.CloseHandle();
+                f.showErrorMsg("未实现的功能【强平】");
+                //SourceGrid.Grid grid = (SourceGrid.Grid)sender.Grid;
+                //OrderEasy f = (OrderEasy)grid.Parent.Parent;
+                //f.SetFocus();
+                //f.CloseHandle();
             }
         }
         public class CenterClickEvent : SourceGrid.Cells.Controllers.ControllerBase
@@ -2238,15 +1801,18 @@ namespace OrderEasy
 
         private void ClearData()
         {
-            notClosePos.vol = 0;
+            notClosePos.long_pos = 0;
+            notClosePos.short_pos = 0;
             //priceMap.Clear();
-            guidPriceMap.Clear();
+            //guidPriceMap.Clear();
             refPriceMap.Clear();
-            buyRefList.Clear();
-            sellRefList.Clear();
+            //buyRefList.Clear();
+            //sellRefList.Clear();
+            buyRefPriceMap.Clear();
+            sellRefPriceMap.Clear();
             pairPriceMap.Clear();
-            buyGuidList.Clear();
-            sellGuidList.Clear();
+            //buyGuidList.Clear();
+            //sellGuidList.Clear();
             marketBuyPrice = 0;
             marketSellPrice = 0;
             priceBuyButtonMap.Clear();
@@ -2254,53 +1820,13 @@ namespace OrderEasy
             SetFLAT();
         }
 
-        private void SetTarget2(bool visible)
-        {
-            numericQty2.Visible = visible;
-            numStopLoss2.Visible = visible;
-            numProfitStop2.Visible = visible;
-        }
 
-        private void SetTarget3(bool visible)
-        {
-            numericQty3.Visible = visible;
-            numStopLoss3.Visible = visible;
-            numProfitStop3.Visible = visible;
-        }
 
-        private void radBtn1_CheckedChanged(object sender, EventArgs e)
-        {
-            numericQty1.Value = txtOrderQty.Value;
-            numericQty1.Enabled = false;
-            SetTarget2(false);
-            SetTarget3(false);
 
-        }
-
-        private void radBtn2_CheckedChanged(object sender, EventArgs e)
-        {
-            numericQty1.Enabled = true;
-            SetTarget2(true);
-            SetTarget3(false);
-        }
-
-        private void radBtn3_CheckedChanged(object sender, EventArgs e)
-        {
-            numericQty1.Enabled = true;
-            SetTarget2(true);
-            SetTarget3(true);
-        }
 
         private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
         {
-            if ("<Custom>".Equals(Convert.ToString(this.comboBox_strat.SelectedItem)))
-            {
-                this.groupBox2.Enabled = true;
-            }
-            else
-            {
-                this.groupBox2.Enabled = false;
-            }
+
         }
 
         private void txtOrderQty_ValueChanged(object sender, EventArgs e)
@@ -2309,10 +1835,6 @@ namespace OrderEasy
             if (txtOrderQty.Value == 0)
             {
                 txtOrderQty.Value = 1;
-            }
-            if (this.radBtn1.Checked)
-            {
-                numericQty1.Value = txtOrderQty.Value;
             }
         }
 
@@ -2358,42 +1880,55 @@ namespace OrderEasy
             });
 
         }
-        private void comb_Instrument_SelectedIndexChanged(object sender, EventArgs e)
+        public void start_data_init(login_resp data)
         {
-            string product = Convert.ToString(comb_product.SelectedItem);
-            string symbol = Convert.ToString(comb_Instrument.SelectedItem);
-            if (String.IsNullOrEmpty(symbol))
+            this.local_ref = data.last_local_ref;
+
+            if(data.long_pos > 0)
             {
-                ZMQControl.Instance().UnsubScribe("", "");
-                return;
+                notClosePos.long_pos = data.long_pos;
+                //notClosePos.dir = TradeType.direction.RC_ORDER_BUY;
+                //notClosePos.vol = data.long_pos;
             }
-            ZMQControl.Instance().UnsubScribe(preSymbol, "TE_" + preSymbol);
-            preSymbol = symbol;
-            if (product == "ST")
+            if(data.short_pos > 0)
             {
-                Future f = new Future();
-                if (common.stockDic.TryGetValue(symbol, out f))
+                notClosePos.short_pos = data.short_pos;
+                //this.notClosePos.dir = TradeType.direction.RC_ORDER_SELL;
+                //notClosePos.vol = data.short_pos;
+            }
+            SetFLAT();
+            int Count = data.order_list.Count;
+            foreach (order_record rec in data.order_list )
+            {
+                //AddRefPriceMap(rec.local_ref, rec.price);
+                if (rec.symbol != subTopic)
                 {
-                    this.tickPoint = f.tick;
-                    this.frmPrice = GetFrmPrice(f.point);
+                    showErrorMsg("后台数据错误：返回的挂单SYMBOL与客户端所选不一至");
+                }
+                if (rec.dir == TradeType.direction.RC_ORDER_BUY)
+                {
+                    repRefList.Add(rec.local_ref);
+                    //buyRefList.Add(rec.local_ref);
+                    buyRefPriceMap.Add(rec.local_ref, rec.price);
+                    if (!priceBuyButtonMap.ContainsKey(FormatPrice(rec.price)))
+                    {
+                        priceBuyButtonMap.Add(FormatPrice(rec.price), rec.vol.ToString());
+                    }
                 }
                 else
                 {
-                    MessageBox.Show("无此合约");
-                    return;
+                    //sellRefList.Add(rec.local_ref);
+                    sellRefPriceMap.Add(rec.local_ref, rec.price);
+                    if (!priceSelButtonMap.ContainsKey(FormatPrice(rec.price)))
+                    {
+                        priceSelButtonMap.Add(FormatPrice(rec.price), rec.vol.ToString());
+                    }
                 }
-
             }
-            else
-            {
-                Future f = common.futureDic[product];
-                this.tickPoint = f.tick;
-                this.frmPrice = GetFrmPrice(f.point);
-
-            }
-            ResetPrice();
-            this.subTopic = symbol;
-            ZMQControl.Instance().SubScript(symbol, "TE_" + symbol);
+            
+        }
+        private void comb_Instrument_SelectedIndexChanged(object sender, EventArgs e)
+        {
 
         }
         /// <summary>
@@ -2420,54 +1955,9 @@ namespace OrderEasy
 
         private void comb_product_SelectedIndexChanged(object sender, EventArgs e)
         {
-            string product = Convert.ToString(comb_product.SelectedItem);
-
-            if (String.IsNullOrEmpty(product))
-            {
-                return;
-            }
-
-            comb_Instrument.Items.Clear();
-
-            if (product == "ST")
-            {
-
-                foreach (KeyValuePair<string, Future> pair in common.stockDic)
-                {
-                    if (pair.Value.isActive)
-                    {
-                        this.comb_Instrument.Items.Add(pair.Value.product);
-                    }
-                }
-                return;
-            }
-            Future f = new Future();
-            if (common.futureDic.TryGetValue(product, out f))
-            {
-                foreach (KeyValuePair<string, Symbol> pair in f.symbolDic)
-                {
-                    if (pair.Value.isActive)
-                    {
-                        this.comb_Instrument.Items.Add(pair.Value.code);
-                    }
-                }
-            }
-
-
 
         }
 
-        private bool AddGuidPriceMap(string guid, double price)
-        {
-
-            if (!guidPriceMap.TryAdd(guid, price))
-            {
-                RemoveGuidPriceMap(guid);
-                showErrorMsg("AddGuidPriceMap fail seqNo=" + guid + "price=" + price);
-                return false;
-            }
-            return true;
-        }
         private bool AddRefPriceMap(int local_ref, double price)
         {
             if (!refPriceMap.TryAdd(local_ref, price))
@@ -2479,16 +1969,6 @@ namespace OrderEasy
             return true;
         }
 
-        private void SendStratOrder(OrderEasy_data oldData)
-        {
-            OrderEasy_data.Direction dir;
-            if (oldData.orderReq.dir == OrderEasy_data.Direction.buy)
-                dir = OrderEasy_data.Direction.sell;
-            else
-                dir = OrderEasy_data.Direction.buy;
-            OrderHandle(dir, oldData.orderReq.strat[0].maxPrice, OrderEasy_data.OrderType.strat);
-
-        }
 
 
     }

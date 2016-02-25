@@ -70,8 +70,8 @@ namespace OrderEasy.common
             sliptKey = ConfigurationManager.AppSettings["sliptKey"];
             string category = ConfigurationManager.AppSettings["category"];
             string strat = ConfigurationManager.AppSettings["strat"];
-            control_id = "easy_" + account + "_" + category + "_" + strat;
-
+            control_id = Guid.NewGuid().ToString() + "_" + account + "_" + category + "_" + strat;
+            
             SetFutureDic(futureSql);
             SetStockDic(stockSql);
         }

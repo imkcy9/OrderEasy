@@ -20,6 +20,8 @@ namespace OrderEasy.common
         public const string OE_POS_RTN = "OE_11";
         public const string OE_MESSAGE_RTN = "OE_12";
         public const string OE_DELET_RTN = "OE_13";
+        public const string OE_HEARTBEAT = "OE_14";
+        public const string OE_FORCE_LOGOUT_RTN = "OE_15";
     }
 
 }

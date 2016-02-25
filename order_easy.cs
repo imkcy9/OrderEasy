@@ -10,6 +10,65 @@
 // Generated from: order_easy.proto
 namespace order_easy
 {
+  [global::System.Serializable, global::ProtoBuf.ProtoContract(Name=@"order_record")]
+  public partial class order_record : global::ProtoBuf.IExtensible
+  {
+    public order_record() {}
+    
+    private int _local_ref;
+    [global::ProtoBuf.ProtoMember(1, IsRequired = true, Name=@"local_ref", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
+    public int local_ref
+    {
+      get { return _local_ref; }
+      set { _local_ref = value; }
+    }
+    private string _symbol;
+    [global::ProtoBuf.ProtoMember(2, IsRequired = true, Name=@"symbol", DataFormat = global::ProtoBuf.DataFormat.Default)]
+    public string symbol
+    {
+      get { return _symbol; }
+      set { _symbol = value; }
+    }
+    private int _price_type;
+    [global::ProtoBuf.ProtoMember(3, IsRequired = true, Name=@"price_type", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
+    public int price_type
+    {
+      get { return _price_type; }
+      set { _price_type = value; }
+    }
+    private double _price;
+    [global::ProtoBuf.ProtoMember(4, IsRequired = true, Name=@"price", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
+    public double price
+    {
+      get { return _price; }
+      set { _price = value; }
+    }
+    private int _vol;
+    [global::ProtoBuf.ProtoMember(5, IsRequired = true, Name=@"vol", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
+    public int vol
+    {
+      get { return _vol; }
+      set { _vol = value; }
+    }
+    private int _dir;
+    [global::ProtoBuf.ProtoMember(6, IsRequired = true, Name=@"dir", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
+    public int dir
+    {
+      get { return _dir; }
+      set { _dir = value; }
+    }
+    private int _order_ref;
+    [global::ProtoBuf.ProtoMember(7, IsRequired = true, Name=@"order_ref", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
+    public int order_ref
+    {
+      get { return _order_ref; }
+      set { _order_ref = value; }
+    }
+    private global::ProtoBuf.IExtension extensionObject;
+    global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
+      { return global::ProtoBuf.Extensible.GetExtensionObject(ref extensionObject, createIfMissing); }
+  }
+  
   [global::System.Serializable, global::ProtoBuf.ProtoContract(Name=@"login_req")]
   public partial class login_req : global::ProtoBuf.IExtensible
   {
@@ -67,9 +126,37 @@ namespace order_easy
       get { return _success; }
       set { _success = value; }
     }
+    private int _last_local_ref;
+    [global::ProtoBuf.ProtoMember(3, IsRequired = true, Name=@"last_local_ref", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
+    public int last_local_ref
+    {
+      get { return _last_local_ref; }
+      set { _last_local_ref = value; }
+    }
+    private int _long_pos;
+    [global::ProtoBuf.ProtoMember(4, IsRequired = true, Name=@"long_pos", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
+    public int long_pos
+    {
+      get { return _long_pos; }
+      set { _long_pos = value; }
+    }
+    private int _short_pos;
+    [global::ProtoBuf.ProtoMember(5, IsRequired = true, Name=@"short_pos", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
+    public int short_pos
+    {
+      get { return _short_pos; }
+      set { _short_pos = value; }
+    }
+    private readonly global::System.Collections.Generic.List<order_easy.order_record> _order_list = new global::System.Collections.Generic.List<order_easy.order_record>();
+    [global::ProtoBuf.ProtoMember(6, Name=@"order_list", DataFormat = global::ProtoBuf.DataFormat.Default)]
+    public global::System.Collections.Generic.List<order_easy.order_record> order_list
+    {
+      get { return _order_list; }
+    }
+  
 
     private string _ErrorMsg = "";
-    [global::ProtoBuf.ProtoMember(3, IsRequired = false, Name=@"ErrorMsg", DataFormat = global::ProtoBuf.DataFormat.Default)]
+    [global::ProtoBuf.ProtoMember(7, IsRequired = false, Name=@"ErrorMsg", DataFormat = global::ProtoBuf.DataFormat.Default)]
     [global::System.ComponentModel.DefaultValue("")]
     public string ErrorMsg
     {
@@ -347,6 +434,30 @@ namespace order_easy
   public partial class message_rtn : global::ProtoBuf.IExtensible
   {
     public message_rtn() {}
+    
+    private string _tick_time;
+    [global::ProtoBuf.ProtoMember(1, IsRequired = true, Name=@"tick_time", DataFormat = global::ProtoBuf.DataFormat.Default)]
+    public string tick_time
+    {
+      get { return _tick_time; }
+      set { _tick_time = value; }
+    }
+    private string _msg;
+    [global::ProtoBuf.ProtoMember(2, IsRequired = true, Name=@"msg", DataFormat = global::ProtoBuf.DataFormat.Default)]
+    public string msg
+    {
+      get { return _msg; }
+      set { _msg = value; }
+    }
+    private global::ProtoBuf.IExtension extensionObject;
+    global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
+      { return global::ProtoBuf.Extensible.GetExtensionObject(ref extensionObject, createIfMissing); }
+  }
+  
+  [global::System.Serializable, global::ProtoBuf.ProtoContract(Name=@"force_logout_rtn")]
+  public partial class force_logout_rtn : global::ProtoBuf.IExtensible
+  {
+    public force_logout_rtn() {}
     
     private string _tick_time;
     [global::ProtoBuf.ProtoMember(1, IsRequired = true, Name=@"tick_time", DataFormat = global::ProtoBuf.DataFormat.Default)]
