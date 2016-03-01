@@ -73,13 +73,6 @@ D:\work\OrderEasy - 11.16\OrderEasy\obj\x86\Release\OrderEasy.Properties.Resourc
 D:\work\OrderEasy - 11.16\OrderEasy\obj\x86\Release\OrderEasy.SetForm.resources
 D:\work\OrderEasy - 11.16\OrderEasy\obj\x86\Release\OrderEasy.csproj.GenerateResource.Cache
 D:\work\OrderEasy - new\OrderEasy\bin\Release\OrderEasy.exe.config
-D:\work\OrderEasy - new\OrderEasy\obj\x86\Release\OrderEasy.exe
-D:\work\OrderEasy - new\OrderEasy\obj\x86\Release\OrderEasy.pdb
-D:\work\OrderEasy - new\OrderEasy\obj\x86\Release\OrderEasy.OrderEasy.resources
-D:\work\OrderEasy - new\OrderEasy\obj\x86\Release\ListViewEx.SubItemEventArgs.resources
-D:\work\OrderEasy - new\OrderEasy\obj\x86\Release\OrderEasy.Properties.Resources.resources
-D:\work\OrderEasy - new\OrderEasy\obj\x86\Release\OrderEasy.SetForm.resources
-D:\work\OrderEasy - new\OrderEasy\obj\x86\Release\OrderEasy.csproj.GenerateResource.Cache
 D:\work\OrderEasy - new\OrderEasy\bin\Release\OrderEasy.exe
 D:\work\OrderEasy - new\OrderEasy\bin\Release\OrderEasy.pdb
 D:\work\OrderEasy - new\OrderEasy\bin\Release\Antlr3.Runtime.dll
@@ -109,4 +102,11 @@ D:\work\OrderEasy - new\OrderEasy\bin\Release\FluentNHibernate.xml
 D:\work\OrderEasy - new\OrderEasy\bin\Release\Iesi.Collections.xml
 D:\work\OrderEasy - new\OrderEasy\bin\Release\NHibernate.xml
 D:\work\OrderEasy - new\OrderEasy\bin\Release\NHibernate.ByteCode.Castle.xml
+D:\work\OrderEasy - new\OrderEasy\obj\x86\Release\OrderEasy.OrderEasy.resources
+D:\work\OrderEasy - new\OrderEasy\obj\x86\Release\ListViewEx.SubItemEventArgs.resources
+D:\work\OrderEasy - new\OrderEasy\obj\x86\Release\OrderEasy.Properties.Resources.resources
+D:\work\OrderEasy - new\OrderEasy\obj\x86\Release\OrderEasy.SetForm.resources
 D:\work\OrderEasy - new\OrderEasy\obj\x86\Release\OrderEasy.LoginForm.resources
+D:\work\OrderEasy - new\OrderEasy\obj\x86\Release\OrderEasy.csproj.GenerateResource.Cache
+D:\work\OrderEasy - new\OrderEasy\obj\x86\Release\OrderEasy.exe
+D:\work\OrderEasy - new\OrderEasy\obj\x86\Release\OrderEasy.pdb

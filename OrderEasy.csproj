@@ -159,7 +159,6 @@
     <Compile Include="common\BiDictionaryOneToOne.cs" />
     <Compile Include="common\Common.cs" />
     <Compile Include="common\MessageType.cs" />
-    <Compile Include="common\OrderEasy_data.cs" />
     <Compile Include="common\SampleAttribute.cs" />
     <Compile Include="common\ZMQControl.cs" />
     <Compile Include="OrderEasy.cs">
@@ -214,7 +213,6 @@
     <None Include="App.config">
       <SubType>Designer</SubType>
     </None>
-    <None Include="OrderEasy_data.proto" />
     <None Include="MDFTicker.proto" />
     <None Include="order_easy.proto" />
     <None Include="Properties\Settings.settings">

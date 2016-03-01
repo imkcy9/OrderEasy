@@ -32,7 +32,10 @@
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.setToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.panel1 = new System.Windows.Forms.Panel();
-            this.comb_account = new System.Windows.Forms.ComboBox();
+            this.labelCurrentInstrument = new System.Windows.Forms.Label();
+            this.labelOrderHang = new System.Windows.Forms.Label();
+            this.label1 = new System.Windows.Forms.Label();
+            this.labelServerState = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
             this.txtOrderQty = new System.Windows.Forms.NumericUpDown();
             this.label2 = new System.Windows.Forms.Label();
@@ -53,7 +56,7 @@
             this.setToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
-            this.menuStrip1.Size = new System.Drawing.Size(373, 25);
+            this.menuStrip1.Size = new System.Drawing.Size(373, 24);
             this.menuStrip1.TabIndex = 7;
             this.menuStrip1.Text = "menuStrip1";
             // 
@@ -62,37 +65,67 @@
             this.setToolStripMenuItem.Name = "setToolStripMenuItem";
             this.setToolStripMenuItem.Size = new System.Drawing.Size(37, 21);
             this.setToolStripMenuItem.Text = "set";
+            this.setToolStripMenuItem.Visible = false;
             this.setToolStripMenuItem.Click += new System.EventHandler(this.setToolStripMenuItem_Click);
             // 
             // panel1
             // 
-            this.panel1.Controls.Add(this.comb_account);
+            this.panel1.Controls.Add(this.labelCurrentInstrument);
+            this.panel1.Controls.Add(this.labelOrderHang);
+            this.panel1.Controls.Add(this.label1);
+            this.panel1.Controls.Add(this.labelServerState);
             this.panel1.Controls.Add(this.label3);
             this.panel1.Controls.Add(this.txtOrderQty);
             this.panel1.Controls.Add(this.label2);
             this.panel1.Location = new System.Drawing.Point(3, 493);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(369, 23);
+            this.panel1.Size = new System.Drawing.Size(369, 52);
             this.panel1.TabIndex = 8;
             // 
-            // comb_account
+            // labelCurrentInstrument
             // 
-            this.comb_account.FormattingEnabled = true;
-            this.comb_account.Location = new System.Drawing.Point(51, 3);
-            this.comb_account.Name = "comb_account";
-            this.comb_account.Size = new System.Drawing.Size(149, 20);
-            this.comb_account.TabIndex = 5;
-            this.comb_account.Visible = false;
+            this.labelCurrentInstrument.AutoSize = true;
+            this.labelCurrentInstrument.Location = new System.Drawing.Point(10, 29);
+            this.labelCurrentInstrument.Name = "labelCurrentInstrument";
+            this.labelCurrentInstrument.Size = new System.Drawing.Size(83, 12);
+            this.labelCurrentInstrument.TabIndex = 8;
+            this.labelCurrentInstrument.Text = "当 前 合 约：";
+            // 
+            // labelOrderHang
+            // 
+            this.labelOrderHang.AutoSize = true;
+            this.labelOrderHang.Location = new System.Drawing.Point(105, 7);
+            this.labelOrderHang.Name = "labelOrderHang";
+            this.labelOrderHang.Size = new System.Drawing.Size(11, 12);
+            this.labelOrderHang.TabIndex = 7;
+            this.labelOrderHang.Text = "0";
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(10, 7);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(89, 12);
+            this.label1.TabIndex = 6;
+            this.label1.Text = "当前挂单总数：";
+            // 
+            // labelServerState
+            // 
+            this.labelServerState.AutoSize = true;
+            this.labelServerState.Location = new System.Drawing.Point(294, 29);
+            this.labelServerState.Name = "labelServerState";
+            this.labelServerState.Size = new System.Drawing.Size(41, 12);
+            this.labelServerState.TabIndex = 5;
+            this.labelServerState.Text = "未登陆";
             // 
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(9, 6);
+            this.label3.Location = new System.Drawing.Point(225, 29);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(41, 12);
+            this.label3.Size = new System.Drawing.Size(77, 12);
             this.label3.TabIndex = 4;
-            this.label3.Text = "帐号：";
-            this.label3.Visible = false;
+            this.label3.Text = "服务器状态：";
             // 
             // txtOrderQty
             // 
@@ -138,8 +171,8 @@
             // 
             // panel2
             // 
-            this.panel2.Controls.Add(this.grid1);
             this.panel2.Controls.Add(this.panel1);
+            this.panel2.Controls.Add(this.grid1);
             this.panel2.Controls.Add(this.groupBox2);
             this.panel2.Location = new System.Drawing.Point(-1, 24);
             this.panel2.Name = "panel2";
@@ -152,9 +185,9 @@
                         | System.Windows.Forms.AnchorStyles.Left)));
             this.groupBox2.Controls.Add(this.richTextBox1);
             this.groupBox2.Enabled = false;
-            this.groupBox2.Location = new System.Drawing.Point(3, 522);
+            this.groupBox2.Location = new System.Drawing.Point(3, 551);
             this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(369, 124);
+            this.groupBox2.Size = new System.Drawing.Size(369, 103);
             this.groupBox2.TabIndex = 10;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "日志";
@@ -164,10 +197,10 @@
             // 
             this.richTextBox1.BackColor = System.Drawing.Color.LightSlateGray;
             this.richTextBox1.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.richTextBox1.Location = new System.Drawing.Point(6, 20);
+            this.richTextBox1.Location = new System.Drawing.Point(5, 19);
             this.richTextBox1.Name = "richTextBox1";
             this.richTextBox1.ReadOnly = true;
-            this.richTextBox1.Size = new System.Drawing.Size(357, 98);
+            this.richTextBox1.Size = new System.Drawing.Size(357, 84);
             this.richTextBox1.TabIndex = 0;
             this.richTextBox1.Text = "";
             // 
@@ -176,13 +209,14 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.LightSlateGray;
-            this.ClientSize = new System.Drawing.Size(373, 672);
+            this.ClientSize = new System.Drawing.Size(373, 681);
             this.Controls.Add(this.panel2);
             this.Controls.Add(this.menuStrip1);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MainMenuStrip = this.menuStrip1;
             this.Name = "OrderEasy";
             this.Text = "快速下单";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.OrderEasy_FormClosing);
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.OrderEasy_FormClosed);
             this.Load += new System.EventHandler(this.Sim101_Load);
             this.menuStrip1.ResumeLayout(false);
@@ -203,7 +237,6 @@
         private System.Windows.Forms.ToolStripMenuItem setToolStripMenuItem;
         private System.Windows.Forms.Panel panel1;
         private System.Windows.Forms.Label label2;
-        private System.Windows.Forms.ComboBox comb_account;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.NumericUpDown txtOrderQty;
 
@@ -212,6 +245,10 @@
         private System.Windows.Forms.Panel panel2;
         private System.Windows.Forms.GroupBox groupBox2;
         private System.Windows.Forms.RichTextBox richTextBox1;
+        private System.Windows.Forms.Label labelServerState;
+        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.Label labelOrderHang;
+        private System.Windows.Forms.Label labelCurrentInstrument;
     }
 }
 

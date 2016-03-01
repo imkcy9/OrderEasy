@@ -15,15 +15,19 @@ namespace OrderEasy.common
 {
     class ZMQControl
     {
+        private bool threadQuit = false;
+        private int lastHeartBeatTime = 0;
+        public bool heartBeatStart = false;
         private System.Windows.Forms.Timer heart_beat_timer;
         private MessageType msg_type = new MessageType();
         public static ZmqContext ctx = ZmqContext.Create();
         private ZmqSocket sktSub = null;
         private ZmqSocket sktDealer = null;
         private static ZMQControl subClass = null;
+        private Poller poller;
         public Dictionary<string, bool> connectDic = new Dictionary<string, bool>();
         private OrderEasy sim;
-        private LoginForm logForm;
+        public LoginForm logForm;
         private bool isDealerInit = false;
         private string control_id;
         private string subscript;
@@ -44,6 +48,10 @@ namespace OrderEasy.common
                 subClass = new ZMQControl();
             }
             return subClass;
+        }
+        public void setControlId(string _control_id)
+        {
+            control_id = _control_id;
         }
         public void Init(SocketType zmqType, string _subscript)
         {
@@ -117,32 +125,15 @@ namespace OrderEasy.common
         }
         public void InitDealer(SocketType zmqType, string addr, string _control_id)
         {
-            control_id = _control_id;
             if (sktDealer == null)
             {
                 sktDealer = ctx.CreateSocket(zmqType);
-
                 sktDealer.TcpKeepalive = TcpKeepaliveBehaviour.Enable;
-                sktDealer.Identity = Encoding.UTF8.GetBytes(control_id);
-                sktDealer.Connect(addr);
-                isDealerInit = true;
+                sktDealer.Identity = Encoding.UTF8.GetBytes(Guid.NewGuid().ToString());
             }
-        }
-        public Boolean Send2Router(OrderEasy_data data)
-        {
-            if (!isDealerInit)
-            {
-                Program.log.Error("the dealer is not init!");
-                return false;
-            }
-            MemoryStream sParam = new MemoryStream();
-            sParam.Seek(0, SeekOrigin.Begin);
-            Serializer.Serialize<OrderEasy_data>(sParam, data);
-            //this.sktDealer.Send("".ToArray(),
-            sktDealer.SendMore(control_id, Encoding.UTF8);
-            this.sktDealer.Send(sParam.ToArray());
-
-            return true;
+            control_id = _control_id;
+            sktDealer.Connect(addr);
+            isDealerInit = true;
         }
 
         public Boolean Send2Router(MemoryStream data, string msg_type)
@@ -156,6 +147,17 @@ namespace OrderEasy.common
             sktDealer.SendMore(msg_type, Encoding.UTF8);
             this.sktDealer.Send(data.ToArray());
 
+            return true;
+        }
+        public Boolean sendReqLogout()
+        {
+            if (!isDealerInit)
+            {
+                Program.log.Error("the dealer is not init!");
+                return false;
+            }
+            sktDealer.SendMore(control_id, Encoding.UTF8);
+            sktDealer.Send(MessageType.OE_LOGOUT_REQ, Encoding.UTF8);
             return true;
         }
         public void Connect(string addr)
@@ -184,22 +186,30 @@ namespace OrderEasy.common
             connMap[addr] = false;
             connectDic[addr] = false;
         }
+        public void dealerDisConnect(string addr)
+        {
+            sktDealer.Disconnect(addr);
+            isDealerInit = false;
+        }
         public void run(LoginForm logForm, OrderEasy sim101)
         {
+            threadQuit = false;
             this.logForm = logForm;
             this.sim = sim101;
             //sktSub.ReceiveReady += (s, e) => ReceiverSubHandler(e.Socket, sktSub);
             //sktDealer.ReceiveReady += (s, e) => ReceiverRouterHandler(e.Socket, sktDealer);
             sktSub.ReceiveReady += new EventHandler<SocketEventArgs>(sktSub_ReceiveReady);
             sktDealer.ReceiveReady += new EventHandler<SocketEventArgs>(sktDealer_ReceiveReady);
-            var poller = new Poller(new List<ZmqSocket> { sktSub ,sktDealer});
+            poller = new Poller(new List<ZmqSocket> { sktSub ,sktDealer});
 
             //  Process messages from both sockets
-            while (true)
+            while (!threadQuit)
             {
                 poller.Poll(System.TimeSpan.FromMilliseconds(2000));
+                heartBeatCheck();
                 //poller.Poll();
             }
+            Program.log.Info("zmq thread end...");
         }
 
         void sktSub_ReceiveReady(object sender, SocketEventArgs e)
@@ -238,7 +248,7 @@ namespace OrderEasy.common
                 {
                     ticker = Serializer.Deserialize<MdfTicker>(revParam);
 
-                    Program.log.Info("price=" + ticker.last + " count=" + testCount);
+                    //Program.log.Info("price=" + ticker.last + " count=" + testCount);
                     this.sim.TickerRevHandle(ticker);
                 }
                 catch (Exception ex)
@@ -253,6 +263,15 @@ namespace OrderEasy.common
 
             string more = e.Socket.Receive(Encoding.UTF8);
             string msgtype = e.Socket.Receive(Encoding.UTF8);
+            if (!e.Socket.ReceiveMore)
+            {
+                if (msgtype == MessageType.OE_HEARTBEAT)
+                {
+                    Program.log.Debug("recv heartbeat");
+                    lastHeartBeatTime = Environment.TickCount;
+                }
+                return;
+            }
 
             byte[] revBytes = new byte[1024 * 256];
             int revSize = e.Socket.Receive(revBytes);
@@ -319,11 +338,10 @@ namespace OrderEasy.common
                 }
                 if (msgtype == MessageType.OE_FORCE_LOGOUT_RTN)
                 {
-                    Program.log.Info("logout");
-                }
-                if (msgtype == MessageType.OE_HEARTBEAT)
-                {
-                    Program.log.Info("recv heartbeat");
+                    force_logout_rtn data = new force_logout_rtn();
+                    data = Serializer.Deserialize<force_logout_rtn>(revParam);
+                    this.sim.on_force_logout_handle(data);
+                    return;
                 }
             }
             catch (Exception ex)
@@ -338,6 +356,8 @@ namespace OrderEasy.common
             heart_beat_timer.Tick += new EventHandler(send_heart_beat);
             heart_beat_timer.Enabled = true;
             heart_beat_timer.Interval = 2000;
+            lastHeartBeatTime = Environment.TickCount;
+            heartBeatStart = true;
         }
 
         private void send_heart_beat(object sender, EventArgs e)
@@ -348,6 +368,27 @@ namespace OrderEasy.common
                 sktDealer.Send(MessageType.OE_HEARTBEAT, Encoding.UTF8);
                 Program.log.Debug("send_heart_beat");
             }
+        }
+
+        private void heartBeatCheck()
+        {
+            if (!heartBeatStart)
+                return;
+            int tickCount = Environment.TickCount;
+            int tickTime = tickCount - lastHeartBeatTime;
+            if(tickTime > 10000)
+            {
+                Program.log.Info("连接超时");
+                this.sim.on_heart_beat_timeout_handle(false);
+            }
+            else
+                this.sim.on_heart_beat_timeout_handle(true);
+        }
+
+        public void zmqTerm()
+        {
+           
+            threadQuit = true;
         }
     }
 }

@@ -6,9 +6,24 @@ using System.Configuration;
 using System.Data.SqlClient;
 using System.Data;
 using MySql.Data.MySqlClient;
-
+using System.Windows.Forms;
 namespace OrderEasy.common
 {
+    public class tb_Version
+    {
+        public int ID;
+        public string Name;
+        public string Version;
+        public string Path;
+    }
+    struct sqlCommand
+    {
+        //public const string mySqlCon = "Database='rctech';Data Source='192.168.0.10';User Id='test';Password='test';charset='utf8'";
+        public const string selectStock = "select t.stock_code,t.tick,t.active,ifnull(t.stock_name,'') stock_name from sb_trading_control.sb_stock t";
+        public const string selectFutureInfo = "select Product,Tip,Scale from tb_Product where IsActiva=1 and IsComb=0 ;";
+        public const string selectFutureInstrument = "select Product,Pair from tb_Product a,tb_Pair b where a.id=b.ProductID and a.IsActiva=1 and a.IsComb=0";
+        public const string selectAccountPair = "select SubAccount,Account,Name,(SELECT IP as ip  from tb_Server where tb_Server.ID= tb_Account.ServerID) as sererip,(SELECT  `Port`  from tb_Server where tb_Server.ID= tb_Account.ServerID) as ipPort from tb_Account  ;";
+    }
     class Future
     {
         public string product = "";
@@ -17,6 +32,7 @@ namespace OrderEasy.common
         public int point = 0;
         public string symbols = "";
         public Dictionary<string, Symbol> symbolDic = new Dictionary<string, Symbol>();
+        public List<string> instrument = new List<string>();
     }
     class Symbol
     {
@@ -33,19 +49,33 @@ namespace OrderEasy.common
         public int point = 0;
         public bool isActive = false;
     }
+
+    class AccountInfo
+    {
+        public string subaccount = "";
+        public string motherAccount = "";
+        public string name = "";
+        public string sertverIp = "";
+        public string ipPort = "";
+    }
     class Common
     {
+        public string currentVersion = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString() + "\n";
+
         private static Common subClass = null;
         public Configuration config;
         public Dictionary<string, Future> futureDic = new Dictionary<string, Future>();
         public Dictionary<string, Future> stockDic = new Dictionary<string, Future>();
         public Dictionary<string, bool> addrDic = new Dictionary<string, bool>();
+        public Dictionary<string, AccountInfo> AccountDic = new Dictionary<string, AccountInfo>();
         public string routerAddr = "";
-        public string account = "";
+        public string subaccount = "";
         public string control_id = "";
         private string sqlServerCon = "";
         private string mysqlCon = "";
         private string sliptKey = "";
+        public string category = "";
+        public string instrument = "";
         public static Common Instance()
         {
             if (subClass == null)
@@ -56,30 +86,24 @@ namespace OrderEasy.common
         }
         public void Init()
         {
-
             config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
             SetDic(addrDic, "subAddr");
-            string futureSql = ConfigurationManager.AppSettings["selectFuture"];
-            string stockSql = ConfigurationManager.AppSettings["selectStock"];
-            sqlServerCon = ConfigurationManager.AppSettings["sqlServerCon"];
+            //mysqlCon = sqlCommand.mySqlCon;
             mysqlCon = ConfigurationManager.AppSettings["mySqlCon"];
-            routerAddr = ConfigurationManager.AppSettings["routerAddr"];
-            account = ConfigurationManager.AppSettings["account"];
-            sliptKey = ConfigurationManager.AppSettings["sliptKey"];
+            //routerAddr = ConfigurationManager.AppSettings["routerAddr"];
+            subaccount = ConfigurationManager.AppSettings["subaccount"];
+            //traderAccount = ConfigurationManager.AppSettings["traderAccount"];
+            sliptKey = "_";
+            category = ConfigurationManager.AppSettings["category"];
+            string strat = ConfigurationManager.AppSettings["strat"];
+            instrument = ConfigurationManager.AppSettings["instrument"];
+            control_id = "easy_" + subaccount + "_" + category + "_" + strat;
+            SetFutureDic(sqlCommand.selectFutureInfo, sqlCommand.selectFutureInstrument);
+            SetStockDic(sqlCommand.selectStock);
+            SetAccount(sqlCommand.selectAccountPair);
 
-            sliptKey = ConfigurationManager.AppSettings["sliptKey"];
-            string category = ConfigurationManager.AppSettings["category"];
-            string strat = ConfigurationManager.AppSettings["strat"];
-            control_id = Guid.NewGuid().ToString() + "_" + account + "_" + category + "_" + strat;
-            
-            SetFutureDic(futureSql);
-            SetStockDic(stockSql);
         }
-        public void set_control_id(string _control_id)
-        {
-            string strat = ConfigurationManager.AppSettings["strat"];
-            control_id = _control_id + "_" + strat;
-        }
+
         private int getPointCount(string point)
         {
             if (!point.Contains('.'))
@@ -87,6 +111,23 @@ namespace OrderEasy.common
                 return 0;
             }
             return point.Split('.')[1].Length;
+        }
+        private void SetAccount(string sql)
+        {
+            List<string> list = SelectData(sql);
+            foreach (string value in list)
+            {
+                AccountInfo accIn = new AccountInfo();
+                
+                string[] data = value.Split(sliptKey[0]);
+                accIn.subaccount = data[0];
+                accIn.motherAccount = data[1];
+                accIn.name = data[2];
+                accIn.sertverIp = data[3];
+                accIn.ipPort = data[4];
+                AccountDic.Add(data[0], accIn);
+            }
+            //AccountDic.Add(subaccount, traderAccount);
         }
         private void SetStockDic(string sql)
         {
@@ -109,7 +150,7 @@ namespace OrderEasy.common
             public bool Active { get; set; }
 
         }
-        private void SetFutureDic(string sql)
+        private void SetFutureDic(string sql, string sql2)
         {
             List<string> list = SelectData(sql);
             List<Future> listF = new List<Future>();
@@ -120,11 +161,32 @@ namespace OrderEasy.common
                 f.product = data[0];
                 double.TryParse(data[1], out f.tick);
                 f.point = getPointCount(data[1]);
-                f.isActive = data[2] == "1" ? true : false;
-                f.symbols = data[3] + this.sliptKey+data[4];
+                f.isActive = true;// data[2] == "1" ? true : false;
+                //f.symbols = data[3] + this.sliptKey+data[4];
                 listF.Add(f);
             }
-            var results = (from fut in listF.AsEnumerable()
+
+            foreach (Future f in listF)
+            {
+                List<string> list2 = SelectData(sql2 + " and Product=" + "\"" + f.product + "\"");
+                foreach (string lis in list2)
+                {
+                    string[] strLis = lis.Split(sliptKey[0]);
+                    if (f.product == strLis[0])
+                    {
+                        string[] InstruLis = strLis[1].Split('-');
+                        if (!f.instrument.Contains(InstruLis[0]))
+                            f.instrument.Add(InstruLis[0]);
+                        if (!f.instrument.Contains(InstruLis[1]))
+                            f.instrument.Add(InstruLis[1]);
+                    }
+                }
+                if(list2.Count != 0)
+                    Common.Instance().futureDic.Add(f.product, f);
+            }
+            
+
+            /*var results = (from fut in listF.AsEnumerable()
                            select fut.product).Distinct();
             foreach (string p in results)
             {
@@ -140,7 +202,7 @@ namespace OrderEasy.common
                     string str = s.symbols;
                     Symbol symbol = new Symbol();
                     symbol.code = str.Split(this.sliptKey[0])[0];
-                    symbol.isActive = str.Split(this.sliptKey[0])[1] == "1"?true:false;
+                    symbol.isActive = true;// str.Split(this.sliptKey[0])[1] == "1" ? true : false;
                     future.isActive = s.isActive;
                     future.point = s.point;
                     future.tick = s.tick;
@@ -148,7 +210,7 @@ namespace OrderEasy.common
                     future.symbolDic.Add(symbol.code, symbol);
                 }
                 Common.Instance().futureDic.Add(future.product, future);
-            }
+            } */
 
            /* DataTable dt = SelectData(sql);
             DataView view = new DataView(dt);
@@ -259,7 +321,7 @@ namespace OrderEasy.common
                         StringBuilder oneData = new StringBuilder();
                         for (int i = 0; i < rdr.FieldCount;i++ )
                         {
-                            oneData.Append(rdr.GetValue(i) + sliptKey);
+                            oneData.Append(rdr.GetValue(i).ToString() + sliptKey);
                         }
                         retList.Add(oneData.ToString());
                     }
@@ -356,8 +418,83 @@ namespace OrderEasy.common
             config.AppSettings.Settings.Add(key, value);
 
         }
+        public void set_control_id(string _control_id)
+        {
+            string strat = ConfigurationManager.AppSettings["strat"];
+            control_id = _control_id + "_" + strat;
+        }
+        public bool CompareVersion()
+        {
+            try
+            {
+                string versionName;
+                versionName = "order_easy";
+                //tb_Version version = common.SelectVersion(versionName);
+                tb_Version version = new tb_Version();
+                version.ID = 1;
+                version.Name = "order_easy";
+                version.Version = "1.0.0.2";
+                if (version != null)
+                {
+                    if (currentVersion != version.Version)
+                    {
+                        if (MessageBox.Show("发现新版本" + version.Version + "，是否更新？", "提示", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+                        {
+                            string updatePath = Application.StartupPath + "\\Update\\Update.exe";
+                            System.Diagnostics.Process.Start(updatePath, version.Path);
+                            System.Environment.Exit(System.Environment.ExitCode);
+                            Program.log.Info("更新为版本：" + version.Version);
+                            return true;
+                        }
+                    }
+                }
+                else
+                {
+                    string msg = "错误：获取版本信息失败！";
+                    Program.log.Error(msg);
+                    MessageBox.Show(msg);
+                }
+            }
+            catch (Exception ex)
+            {
+                string msg = "错误：获取版本信息失败！";
+                Program.log.Error(msg + ex.Message);
+                MessageBox.Show(msg);
+            }
+            return false;
+        }
+        //public tb_Version SelectVersion(string Name)
+        //{
+        //    try
+        //    {
+        //        DataTable table = new DataTable();
+        //        string strVersion = "select * from tb_Version where Name='" + Name + "'";
+        //        using (MySqlConnection sqlConn = new MySqlConnection(strRcConn))
+        //        {
+        //            using (MySqlDataAdapter dapt = new MySqlDataAdapter(strVersion, sqlConn))
+        //            {
+        //                dapt.Fill(table);
+        //            }
+        //        }
 
-
+        //        tb_Version version = new tb_Version();
+        //        if (table.Rows.Count > 0)
+        //        {
+        //            version.ID = Convert.ToInt32(table.Rows[0]["ID"]);
+        //            version.Name = table.Rows[0]["Name"].ToString();
+        //            version.Version = table.Rows[0]["Version"].ToString();
+        //            version.Path = table.Rows[0]["Path"].ToString();
+        //        }
+        //        return version;
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        string msg = "错误：获取最新版本信息失败！";
+        //        Program.log.Error(msg + ex.Message);
+        //        MessageBox.Show(msg);
+        //        return null;
+        //    }
+        //}
         #endregion
 
     }

@@ -22,6 +22,8 @@ namespace OrderEasy.common
         public const string OE_DELET_RTN = "OE_13";
         public const string OE_HEARTBEAT = "OE_14";
         public const string OE_FORCE_LOGOUT_RTN = "OE_15";
+        public const string OE_LOGOUT_REQ = "OE_16";
+        public const string OE_LOGOUT_RESP = "OE_17";
     }
 
 }

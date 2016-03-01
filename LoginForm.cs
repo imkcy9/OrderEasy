@@ -13,11 +13,15 @@ using order_easy;
 using ProtoBuf;
 using System.IO;
 using TraderControl;
+using System.Configuration;
 
 namespace OrderEasy
 {
+
     public partial class LoginForm : Form
     {
+        private string routerAddr = "";
+        public Thread testThread = null;
         private Common common = Common.Instance();
         private OrderEasy order_easy = new OrderEasy();
         private double current_tick = -1.0;
@@ -37,14 +41,16 @@ namespace OrderEasy
                 {
                     comb_product.Items.Add(f.product);
                 }
-
             }
+            //foreach (KeyValuePair<string, string> pair in common.AccountDic)
+            //{
+            //    this.comb_account.Items.Add(pair.Key);
+            //}
             comb_product.Items.Add("ST");
+            comb_account.Text = common.subaccount;
+            comb_product.SelectedIndex = comb_product.Items.IndexOf(common.category);
+            comb_Instrument.SelectedIndex = comb_Instrument.Items.IndexOf(common.instrument);
 
-            this.comb_account.Items.Add(common.account);
-            comb_account.SelectedIndex = comb_account.Items.IndexOf(common.account);
-            comb_product.SelectedIndex = 0;
-            comb_Instrument.SelectedIndex = 0;
 
             //comb_account.Enabled = false;
         }
@@ -54,12 +60,11 @@ namespace OrderEasy
 
             //common = Common.Instance();
             common.Init();
-        }
-        private void initZMQ()
-        {
 
+        }
+        private void initMdfSub()
+        {
             ZMQControl.Instance().Init(ZeroMQ.SocketType.SUB, "");
-            ZMQControl.Instance().InitDealer(SocketType.DEALER, common.routerAddr, common.control_id);
             foreach (KeyValuePair<string, bool> pair in common.addrDic)
             {
                 if (pair.Value)
@@ -67,56 +72,55 @@ namespace OrderEasy
                     ZMQControl.Instance().Connect(pair.Key);
                 }
             }
+        }
+        private void initZmqDealer()
+        {
 
+            if (!common.AccountDic.ContainsKey(comb_account.Text))
+            {
+                MessageBox.Show("初始化失败，数据库未找到帐号信息");
+                return;
+            }
+            string temAddr = "tcp://" + common.AccountDic[comb_account.Text].sertverIp + ":" + common.AccountDic[comb_account.Text].ipPort;
+            if (routerAddr != "" && temAddr != routerAddr)
+                ZMQControl.Instance().dealerDisConnect(routerAddr);
+            routerAddr = temAddr;
+           
+            ZMQControl.Instance().InitDealer(SocketType.DEALER, routerAddr, common.control_id);
         }
 
         private void runZMQ()
         {
-
-            Thread testThread = new Thread((ThreadStart)delegate { ZMQControl.Instance().run(this,order_easy); });
-            testThread.IsBackground = true;
-            testThread.Start();
-            //testThread.Join();
+            if (testThread == null)
+            {
+                testThread = new Thread((ThreadStart)delegate { ZMQControl.Instance().run(this, order_easy); });
+                testThread.IsBackground = true;
+                testThread.Start();
+                //testThread.Join();
+            }
         }
         private void LoginForm_Load(object sender, EventArgs e)
         {
             initCommon();
-            initZMQ();
-            runZMQ();
+            initMdfSub();
+
         }
 
         private void button_login_Click(object sender, EventArgs e)
         {
+
+            if (!accountCheck(comb_account.Text))
+            {
+                MessageBox.Show("未找到数据库对应的母帐号信息");
+                return;
+            }
             string control_id = "easy_" + comb_account.Text + "_" + comb_product.Text;
             common.set_control_id(control_id);
-            initZMQ();
+            ZMQControl.Instance().setControlId(common.control_id);
+            //zmqTerm();
+            initZmqDealer();
+            runZMQ();
             login();
-
-            //login_resp d = new login_resp();
-            //d.success = 0;
-            //d.symbol = comb_Instrument.Text;
-            //d.last_local_ref = 10;
-            //d.long_pos = 4;
-            //d.short_pos = 5;
-            //for (int i = 0; i < 10; i++)
-            //{
-            //    order_record item = new order_record();
-            //    item.dir = i % 2 == 0 ? TradeType.direction.RC_ORDER_BUY : TradeType.direction.RC_ORDER_SELL;
-            //    item.local_ref = i;
-            //    item.order_ref = i + 10000;
-            //    item.price = i * this.current_tick + 36010;
-            //    item.price_type = TradeType.price_type.RC_ORDER_LIMIT;
-            //    item.symbol = "cu1604";
-            //    item.vol = 100 + i;
-            //    d.order_list.Add(item);
-            //}
-            //on_login_resp(d);
-
-            //pos_rtn d2 = new pos_rtn();
-            //d2.dir = 48;
-            //d2.symbol = comb_Instrument.Text;
-            //d2.vol = 10;
-            //order_easy.on_pos_rtn_handle(d2);
         }
 
         public void on_login_resp(login_resp data)
@@ -134,10 +138,13 @@ namespace OrderEasy
                     MessageBox.Show("登陆失败：服务器返回symbol与前端symbol不一致");
                     return;
                 }
-                //ZMQControl.Instance().heart_beat_timer_start();
+                common.CompareVersion();
+
                 order_easy.Show();
+                ZMQControl.Instance().heart_beat_timer_start();
                 order_easy.start_sub_recv(comb_product.Text, comb_Instrument.Text);
                 order_easy.start_data_init(data);
+                saveConfig();
                 this.Hide();
             });
         }
@@ -174,25 +181,28 @@ namespace OrderEasy
             Future f = new Future();
             if (common.futureDic.TryGetValue(product, out f))
             {
-                foreach (KeyValuePair<string, Symbol> pair in f.symbolDic)
+                foreach (string instrument in f.instrument)
                 {
-                    if (pair.Value.isActive)
-                    {
-                        this.comb_Instrument.Items.Add(pair.Value.code);
-                        this.current_tick = f.tick;
-                    }
+                    this.comb_Instrument.Items.Add(instrument);
+                    this.current_tick = f.tick;
                 }
+                //foreach (KeyValuePair<string, Symbol> pair in f.symbolDic)
+                //{
+                //    if (pair.Value.isActive)
+                //    {
+                //        this.comb_Instrument.Items.Add(pair.Value.code);
+                //        this.current_tick = f.tick;
+                //    }
+                //}
             }
-
- 
-
+            comb_Instrument.SelectedIndex = 0;
         }
 
         private void login()
         {
             login_req data = new login_req();
-            data.version = "beta";
-            data.account = comb_account.Text;
+            data.version = common.currentVersion;
+            data.account = common.AccountDic[comb_account.Text].motherAccount;
             data.symbol = comb_Instrument.Text;
             data.symbol_tip = this.current_tick;
 
@@ -201,5 +211,37 @@ namespace OrderEasy
             Serializer.Serialize<login_req>(sParam, data);
             ZMQControl.Instance().Send2Router(sParam, MessageType.OE_LOGIN_REQ);
         }
+
+        private void LoginForm_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            zmqTerm();
+        }
+
+        private void zmqTerm()
+        {
+            ZMQControl.Instance().zmqTerm();
+            if (testThread != null && testThread.ThreadState == ThreadState.Running)
+                testThread.Join();
+        }
+
+        private bool accountCheck(string subAccount)
+        {
+            if (common.AccountDic.ContainsKey(subAccount))
+                return true;
+            else
+                return false;
+        }
+
+        private void saveConfig()
+        {
+            common.config.AppSettings.Settings.Remove("subaccount");
+            common.config.AppSettings.Settings.Add("subaccount", comb_account.Text);
+            common.config.AppSettings.Settings.Remove("category");
+            common.config.AppSettings.Settings.Add("category", comb_product.Text);
+            common.config.AppSettings.Settings.Remove("instrument");
+            common.config.AppSettings.Settings.Add("instrument", comb_Instrument.Text);
+            common.config.Save(ConfigurationSaveMode.Modified);
+        }
+
     }
 }
