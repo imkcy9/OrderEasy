@@ -14,7 +14,8 @@ using ProtoBuf;
 using System.IO;
 using TraderControl;
 using System.Configuration;
-
+using System.Security.Cryptography;
+using System;
 namespace OrderEasy
 {
 
@@ -83,10 +84,16 @@ namespace OrderEasy
             }
             string temAddr = "tcp://" + common.AccountDic[comb_account.Text].sertverIp + ":" + common.AccountDic[comb_account.Text].ipPort;
             if (routerAddr != "" && temAddr != routerAddr)
+            {
                 ZMQControl.Instance().dealerDisConnect(routerAddr);
+                ZMQControl.Instance().dealerConnect(temAddr);
+            }
+            else
+            {
+                if (routerAddr == "")
+                    ZMQControl.Instance().InitDealer(SocketType.DEALER, temAddr, common.control_id);
+            }
             routerAddr = temAddr;
-           
-            ZMQControl.Instance().InitDealer(SocketType.DEALER, routerAddr, common.control_id);
         }
 
         private void runZMQ()
@@ -96,6 +103,8 @@ namespace OrderEasy
                 testThread = new Thread((ThreadStart)delegate { ZMQControl.Instance().run(this, order_easy); });
                 testThread.IsBackground = true;
                 testThread.Start();
+                //Thread.Sleep(1000);
+                //ZMQControl.Instance().zmqTerm();
                 //testThread.Join();
             }
         }
@@ -108,12 +117,16 @@ namespace OrderEasy
 
         private void button_login_Click(object sender, EventArgs e)
         {
-
+            if (!pswCheck(comb_account.Text, passwordBox.Text))
+            {
+                return;
+            }
             if (!accountCheck(comb_account.Text))
             {
                 MessageBox.Show("未找到数据库对应的母帐号信息");
                 return;
             }
+            
             string control_id = "easy_" + comb_account.Text + "_" + comb_product.Text;
             common.set_control_id(control_id);
             ZMQControl.Instance().setControlId(common.control_id);
@@ -122,7 +135,43 @@ namespace OrderEasy
             runZMQ();
             login();
         }
-
+        private bool pswCheck(string account, string pswd)
+        {
+            if (pswd == "" || account == "")
+            {
+                MessageBox.Show("帐号或密码不能为空");
+                return false;
+            }
+            if (!common.passwordDic.ContainsKey(account))
+            {
+                MessageBox.Show("不存在的帐号");
+                return false;
+            }
+            string pswdFromSql = common.passwordDic[account];
+            string pswdFromBox = Md5Hash(pswd);
+            if (pswdFromSql != pswdFromBox)
+            {
+                MessageBox.Show("密码错误");
+                return false;
+            }
+            return true;
+        }
+        /// <summary>
+        /// 32位MD5加密
+        /// </summary>
+        /// <param name="input"></param>
+        /// <returns></returns>
+        private static string Md5Hash(string input)
+        {
+            MD5CryptoServiceProvider md5Hasher = new MD5CryptoServiceProvider();
+            byte[] data = md5Hasher.ComputeHash(Encoding.Default.GetBytes(input));
+            StringBuilder sBuilder = new StringBuilder();
+            for (int i = 0; i < data.Length; i++)
+            {
+                sBuilder.Append(data[i].ToString("x2"));
+            }
+            return sBuilder.ToString();
+        }
         public void on_login_resp(login_resp data)
         {
              
@@ -145,6 +194,11 @@ namespace OrderEasy
                 order_easy.start_sub_recv(comb_product.Text, comb_Instrument.Text);
                 order_easy.start_data_init(data);
                 saveConfig();
+               
+                order_easy.operation_log("登陆成功 " + " 子帐号:" + comb_account.Text + " 合约:" + comb_Instrument.Text
+                    + " tip:" + this.current_tick + " Server:"
+                    + common.AccountDic[comb_account.Text].sertverIp + ":" + common.AccountDic[comb_account.Text].ipPort);
+
                 this.Hide();
             });
         }
@@ -214,14 +268,18 @@ namespace OrderEasy
 
         private void LoginForm_FormClosing(object sender, FormClosingEventArgs e)
         {
+
+            ZMQControl.Instance().sendReqLogout();
             zmqTerm();
+
         }
 
-        private void zmqTerm()
+        public void zmqTerm()
         {
+            ZMQControl.Instance().stopHeartBeatTimer();
             ZMQControl.Instance().zmqTerm();
-            if (testThread != null && testThread.ThreadState == ThreadState.Running)
-                testThread.Join();
+            //if (testThread != null && (testThread.ThreadState & ThreadState.Background) != 0)
+                //testThread.Join();
         }
 
         private bool accountCheck(string subAccount)
@@ -242,6 +300,5 @@ namespace OrderEasy
             common.config.AppSettings.Settings.Add("instrument", comb_Instrument.Text);
             common.config.Save(ConfigurationSaveMode.Modified);
         }
-
     }
 }

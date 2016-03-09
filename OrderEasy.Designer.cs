@@ -41,8 +41,8 @@
             this.label2 = new System.Windows.Forms.Label();
             this.grid1 = new SourceGrid.Grid();
             this.panel2 = new System.Windows.Forms.Panel();
-            this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.richTextBox1 = new System.Windows.Forms.RichTextBox();
+            this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.menuStrip1.SuspendLayout();
             this.panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.txtOrderQty)).BeginInit();
@@ -56,7 +56,7 @@
             this.setToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
-            this.menuStrip1.Size = new System.Drawing.Size(373, 24);
+            this.menuStrip1.Size = new System.Drawing.Size(639, 24);
             this.menuStrip1.TabIndex = 7;
             this.menuStrip1.Text = "menuStrip1";
             // 
@@ -163,7 +163,7 @@
             this.grid1.Name = "grid1";
             this.grid1.OptimizeMode = SourceGrid.CellOptimizeMode.ForRows;
             this.grid1.SelectionMode = SourceGrid.GridSelectionMode.Cell;
-            this.grid1.Size = new System.Drawing.Size(375, 487);
+            this.grid1.Size = new System.Drawing.Size(372, 487);
             this.grid1.TabIndex = 0;
             this.grid1.TabStop = true;
             this.grid1.ToolTipText = "";
@@ -173,52 +173,53 @@
             // 
             this.panel2.Controls.Add(this.panel1);
             this.panel2.Controls.Add(this.grid1);
-            this.panel2.Controls.Add(this.groupBox2);
             this.panel2.Location = new System.Drawing.Point(-1, 24);
             this.panel2.Name = "panel2";
-            this.panel2.Size = new System.Drawing.Size(375, 649);
+            this.panel2.Size = new System.Drawing.Size(365, 555);
             this.panel2.TabIndex = 9;
-            // 
-            // groupBox2
-            // 
-            this.groupBox2.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-                        | System.Windows.Forms.AnchorStyles.Left)));
-            this.groupBox2.Controls.Add(this.richTextBox1);
-            this.groupBox2.Enabled = false;
-            this.groupBox2.Location = new System.Drawing.Point(3, 551);
-            this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(369, 103);
-            this.groupBox2.TabIndex = 10;
-            this.groupBox2.TabStop = false;
-            this.groupBox2.Text = "日志";
-            this.groupBox2.Visible = false;
             // 
             // richTextBox1
             // 
-            this.richTextBox1.BackColor = System.Drawing.Color.LightSlateGray;
+            this.richTextBox1.BackColor = System.Drawing.Color.AliceBlue;
             this.richTextBox1.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.richTextBox1.Location = new System.Drawing.Point(5, 19);
+            this.richTextBox1.Location = new System.Drawing.Point(0, 3);
             this.richTextBox1.Name = "richTextBox1";
             this.richTextBox1.ReadOnly = true;
-            this.richTextBox1.Size = new System.Drawing.Size(357, 84);
+            this.richTextBox1.Size = new System.Drawing.Size(255, 484);
             this.richTextBox1.TabIndex = 0;
             this.richTextBox1.Text = "";
+            // 
+            // groupBox2
+            // 
+            this.groupBox2.Controls.Add(this.richTextBox1);
+            this.groupBox2.Location = new System.Drawing.Point(380, 24);
+            this.groupBox2.Name = "groupBox2";
+            this.groupBox2.Size = new System.Drawing.Size(255, 487);
+            this.groupBox2.TabIndex = 10;
+            this.groupBox2.TabStop = false;
+            this.groupBox2.Visible = false;
             // 
             // OrderEasy
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.AutoSize = true;
             this.BackColor = System.Drawing.Color.LightSlateGray;
-            this.ClientSize = new System.Drawing.Size(373, 681);
+            this.ClientSize = new System.Drawing.Size(639, 582);
+            this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.panel2);
             this.Controls.Add(this.menuStrip1);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.Fixed3D;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+            this.KeyPreview = true;
             this.MainMenuStrip = this.menuStrip1;
+            this.MaximizeBox = false;
             this.Name = "OrderEasy";
             this.Text = "快速下单";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.OrderEasy_FormClosing);
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.OrderEasy_FormClosed);
             this.Load += new System.EventHandler(this.Sim101_Load);
+            this.KeyUp += new System.Windows.Forms.KeyEventHandler(this.OrderEasy_KeyUp);
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
             this.panel1.ResumeLayout(false);
@@ -243,12 +244,12 @@
 
         private SourceGrid.Grid grid1;
         private System.Windows.Forms.Panel panel2;
-        private System.Windows.Forms.GroupBox groupBox2;
-        private System.Windows.Forms.RichTextBox richTextBox1;
         private System.Windows.Forms.Label labelServerState;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label labelOrderHang;
         private System.Windows.Forms.Label labelCurrentInstrument;
+        private System.Windows.Forms.RichTextBox richTextBox1;
+        private System.Windows.Forms.GroupBox groupBox2;
     }
 }
 

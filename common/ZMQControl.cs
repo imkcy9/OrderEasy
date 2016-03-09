@@ -191,6 +191,11 @@ namespace OrderEasy.common
             sktDealer.Disconnect(addr);
             isDealerInit = false;
         }
+        public void dealerConnect(string addr)
+        {
+            sktDealer.Connect(addr);
+            isDealerInit = true;
+        }
         public void run(LoginForm logForm, OrderEasy sim101)
         {
             threadQuit = false;
@@ -343,6 +348,10 @@ namespace OrderEasy.common
                     this.sim.on_force_logout_handle(data);
                     return;
                 }
+                if (msgtype == MessageType.OE_LOGOUT_RESP)
+                {
+                    return;
+                }
             }
             catch (Exception ex)
             {
@@ -372,7 +381,9 @@ namespace OrderEasy.common
 
         private void heartBeatCheck()
         {
-            if (!heartBeatStart)
+            if (!heartBeatStart || threadQuit)
+                return;
+            if (sim.Disposing || sim.IsDisposed || !sim.Visible)
                 return;
             int tickCount = Environment.TickCount;
             int tickTime = tickCount - lastHeartBeatTime;
@@ -387,8 +398,12 @@ namespace OrderEasy.common
 
         public void zmqTerm()
         {
-           
             threadQuit = true;
+        }
+
+        public void stopHeartBeatTimer()
+        {
+            heartBeatStart = false;
         }
     }
 }

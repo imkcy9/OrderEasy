@@ -23,6 +23,7 @@ namespace OrderEasy.common
         public const string selectFutureInfo = "select Product,Tip,Scale from tb_Product where IsActiva=1 and IsComb=0 ;";
         public const string selectFutureInstrument = "select Product,Pair from tb_Product a,tb_Pair b where a.id=b.ProductID and a.IsActiva=1 and a.IsComb=0";
         public const string selectAccountPair = "select SubAccount,Account,Name,(SELECT IP as ip  from tb_Server where tb_Server.ID= tb_Account.ServerID) as sererip,(SELECT  `Port`  from tb_Server where tb_Server.ID= tb_Account.ServerID) as ipPort from tb_Account  ;";
+        public const string selectPswdPair = "select user_id, role_id,login_pwd from tbl_user where active_flag=1; ";
     }
     class Future
     {
@@ -60,7 +61,7 @@ namespace OrderEasy.common
     }
     class Common
     {
-        public string currentVersion = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString() + "\n";
+        public string currentVersion = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();
 
         private static Common subClass = null;
         public Configuration config;
@@ -68,11 +69,13 @@ namespace OrderEasy.common
         public Dictionary<string, Future> stockDic = new Dictionary<string, Future>();
         public Dictionary<string, bool> addrDic = new Dictionary<string, bool>();
         public Dictionary<string, AccountInfo> AccountDic = new Dictionary<string, AccountInfo>();
+        public Dictionary<string, string> passwordDic = new Dictionary<string, string>();
         public string routerAddr = "";
         public string subaccount = "";
         public string control_id = "";
         private string sqlServerCon = "";
         private string mysqlCon = "";
+        private string mySqlPswd = "";
         private string sliptKey = "";
         public string category = "";
         public string instrument = "";
@@ -90,6 +93,7 @@ namespace OrderEasy.common
             SetDic(addrDic, "subAddr");
             //mysqlCon = sqlCommand.mySqlCon;
             mysqlCon = ConfigurationManager.AppSettings["mySqlCon"];
+            mySqlPswd = ConfigurationManager.AppSettings["mySqlPswd"];
             //routerAddr = ConfigurationManager.AppSettings["routerAddr"];
             subaccount = ConfigurationManager.AppSettings["subaccount"];
             //traderAccount = ConfigurationManager.AppSettings["traderAccount"];
@@ -101,7 +105,7 @@ namespace OrderEasy.common
             SetFutureDic(sqlCommand.selectFutureInfo, sqlCommand.selectFutureInstrument);
             SetStockDic(sqlCommand.selectStock);
             SetAccount(sqlCommand.selectAccountPair);
-
+            SetPswd(sqlCommand.selectPswdPair);
         }
 
         private int getPointCount(string point)
@@ -112,11 +116,25 @@ namespace OrderEasy.common
             }
             return point.Split('.')[1].Length;
         }
-        private void SetAccount(string sql)
+
+        private void SetPswd(string sql)
         {
-            List<string> list = SelectData(sql);
+            List<string> list = SelectData(mySqlPswd ,sql);
             foreach (string value in list)
             {
+                string[] data = value.Split(sliptKey[0]);
+                string temp;
+                if (!passwordDic.TryGetValue(data[0], out temp))
+                    passwordDic.Add(data[0], data[2]);
+                else
+                    MessageBox.Show("passwordDic数据库存在重复的帐号：" + data[0]);
+            }
+        }
+        private void SetAccount(string sql)
+        {
+            List<string> list = SelectData(mysqlCon, sql);
+            foreach (string value in list)
+            { 
                 AccountInfo accIn = new AccountInfo();
                 
                 string[] data = value.Split(sliptKey[0]);
@@ -125,13 +143,17 @@ namespace OrderEasy.common
                 accIn.name = data[2];
                 accIn.sertverIp = data[3];
                 accIn.ipPort = data[4];
-                AccountDic.Add(data[0], accIn);
+                AccountInfo temp;
+                if (!AccountDic.TryGetValue(data[0], out temp))
+                    AccountDic.Add(data[0], accIn);
+                else
+                    MessageBox.Show("AccountDic数据库存在重复的帐号：" + data[0]);
             }
             //AccountDic.Add(subaccount, traderAccount);
         }
         private void SetStockDic(string sql)
         {
-            List<string> list = SelectData(sql);
+            List<string> list = SelectData(mysqlCon, sql);
             foreach (string value in list)
             {
                 Future f = new Future();
@@ -152,7 +174,7 @@ namespace OrderEasy.common
         }
         private void SetFutureDic(string sql, string sql2)
         {
-            List<string> list = SelectData(sql);
+            List<string> list = SelectData(mysqlCon,sql);
             List<Future> listF = new List<Future>();
             foreach (string value in list)
             {
@@ -168,7 +190,7 @@ namespace OrderEasy.common
 
             foreach (Future f in listF)
             {
-                List<string> list2 = SelectData(sql2 + " and Product=" + "\"" + f.product + "\"");
+                List<string> list2 = SelectData(mysqlCon, sql2 + " and Product=" + "\"" + f.product + "\"");
                 foreach (string lis in list2)
                 {
                     string[] strLis = lis.Split(sliptKey[0]);
@@ -303,14 +325,14 @@ namespace OrderEasy.common
             return "";
         }
 
-        public List<string> SelectData(string selectSql)
+        public List<string> SelectData(string sqlCon, string selectSql)
         {
             List<string> retList = new List<string>();
             MySqlConnection conn = null;
             //MySqlDataReader rdr = null;
             try
             {
-                conn = new MySqlConnection(mysqlCon);
+                conn = new MySqlConnection(sqlCon);
                 conn.Open();
                 MySqlCommand cmd = new MySqlCommand(selectSql, conn);
 
@@ -428,12 +450,8 @@ namespace OrderEasy.common
             try
             {
                 string versionName;
-                versionName = "order_easy";
-                //tb_Version version = common.SelectVersion(versionName);
-                tb_Version version = new tb_Version();
-                version.ID = 1;
-                version.Name = "order_easy";
-                version.Version = "1.0.0.2";
+                versionName = "Order_Easy";
+                tb_Version version = SelectVersion(versionName);
                 if (version != null)
                 {
                     if (currentVersion != version.Version)
@@ -442,7 +460,8 @@ namespace OrderEasy.common
                         {
                             string updatePath = Application.StartupPath + "\\Update\\Update.exe";
                             System.Diagnostics.Process.Start(updatePath, version.Path);
-                            System.Environment.Exit(System.Environment.ExitCode);
+                            //System.Environment.Exit(System.Environment.ExitCode);
+                            Application.Exit();
                             Program.log.Info("更新为版本：" + version.Version);
                             return true;
                         }
@@ -463,38 +482,38 @@ namespace OrderEasy.common
             }
             return false;
         }
-        //public tb_Version SelectVersion(string Name)
-        //{
-        //    try
-        //    {
-        //        DataTable table = new DataTable();
-        //        string strVersion = "select * from tb_Version where Name='" + Name + "'";
-        //        using (MySqlConnection sqlConn = new MySqlConnection(strRcConn))
-        //        {
-        //            using (MySqlDataAdapter dapt = new MySqlDataAdapter(strVersion, sqlConn))
-        //            {
-        //                dapt.Fill(table);
-        //            }
-        //        }
+        public tb_Version SelectVersion(string Name)
+        {
+            try
+            {
+                DataTable table = new DataTable();
+                string strVersion = "select * from tb_Version where Name='" + Name + "'";
+                using (MySqlConnection sqlConn = new MySqlConnection(mysqlCon))
+                {
+                    using (MySqlDataAdapter dapt = new MySqlDataAdapter(strVersion, sqlConn))
+                    {
+                        dapt.Fill(table);
+                    }
+                }
 
-        //        tb_Version version = new tb_Version();
-        //        if (table.Rows.Count > 0)
-        //        {
-        //            version.ID = Convert.ToInt32(table.Rows[0]["ID"]);
-        //            version.Name = table.Rows[0]["Name"].ToString();
-        //            version.Version = table.Rows[0]["Version"].ToString();
-        //            version.Path = table.Rows[0]["Path"].ToString();
-        //        }
-        //        return version;
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        string msg = "错误：获取最新版本信息失败！";
-        //        Program.log.Error(msg + ex.Message);
-        //        MessageBox.Show(msg);
-        //        return null;
-        //    }
-        //}
+                tb_Version version = new tb_Version();
+                if (table.Rows.Count > 0)
+                {
+                    version.ID = Convert.ToInt32(table.Rows[0]["ID"]);
+                    version.Name = table.Rows[0]["Name"].ToString();
+                    version.Version = table.Rows[0]["Version"].ToString();
+                    version.Path = table.Rows[0]["Path"].ToString();
+                }
+                return version;
+            }
+            catch (Exception ex)
+            {
+                string msg = "错误：获取最新版本信息失败！";
+                Program.log.Error(msg + ex.Message);
+                MessageBox.Show(msg);
+                return null;
+            }
+        }
         #endregion
 
     }

@@ -30,6 +30,7 @@ namespace OrderEasy
         private int firstPriceIndex = 0;
         private int endPriceIndex = 0;
         private int lastIndex = 0;
+        private double lastPrice = 0;
         private string account = "";
         private string frmPrice = "{0:0.0}";
         private string subTopic = "";
@@ -213,9 +214,9 @@ namespace OrderEasy
             //Rectangle r = new Rectangle();
 
             this.grid1.RectangleToScreen(new Rectangle());
-
-            this.panel2.Width = Width;// this.Width;
-            this.grid1.Width = Width;// this.Width;
+            this.Size = new Size(376, 605);
+            this.panel2.Width = 376;// this.Width;
+            this.grid1.Width = 376;// this.Width;
             //priceView
             //grid1.Columns[0].Visible = false;
             grid1.Redim(27, 7);
@@ -378,7 +379,7 @@ namespace OrderEasy
         {
 
             base.OnLoad(e);
-
+           
             InitView();
             SetGrid1();
             notClosePos.long_pos = notClosePos.short_pos = 0;
@@ -403,13 +404,13 @@ namespace OrderEasy
         protected void SetFocus()
         {
 
-            grid1.Selection.Focus(new SourceGrid.Position(24, 3), true);
+            grid1.Selection.Focus(new SourceGrid.Position(25, 3), true);
         }
 
         private void Sim101_Load(object sender, EventArgs e)
         {
             common = Common.Instance();
-            richTextBox1.Text = "日志信息";
+            richTextBox1.Text = "";
         }
 
 
@@ -468,9 +469,15 @@ namespace OrderEasy
 
             ZMQControl.Instance().Send2Router(sParam, MessageType.OE_ORDER_REQ);
             if (direction == TradeType.direction.RC_ORDER_BUY)
+            {
                 buyRefPriceMap.Add(data.local_ref, price);
+                operation_log("ref:" + data.local_ref + " price:" + price.ToString() + " 买");
+            }
             else
+            {
                 sellRefPriceMap.Add(data.local_ref, price);
+                operation_log("ref:" + data.local_ref + " price:" + price.ToString() + " 卖");
+            }
             return true;
         }
 
@@ -497,10 +504,11 @@ namespace OrderEasy
         {
             Invoke((MethodInvoker)delegate
             {
-                showErrorMsg("错误返回信息：" + data.error_msg);
+                showErrorMsg("报单错误：" + data.error_msg);
                 delete_rtn tempData = new delete_rtn();
                 tempData.local_ref = data.local_ref;
                 on_delete_rtn_handle(tempData);
+                operation_log("报单错误: " + data.error_msg + " ref:" + local_ref);
             });
         }
         public void on_cancel_resp_err_handle(cancel_resp_err data)
@@ -511,6 +519,7 @@ namespace OrderEasy
                 delete_rtn tempData = new delete_rtn();
                 tempData.local_ref = data.local_ref;
                 on_delete_rtn_handle(tempData);
+                operation_log("撤单错误: " + data.error_msg + " ref:" + local_ref);
             });
 
         }
@@ -533,12 +542,16 @@ namespace OrderEasy
         {
             Invoke((MethodInvoker)delegate
             {
-                Program.log.Info(data.msg);
-                string msg = data.msg + "\n" + richTextBox1.Text;
-                richTextBox1.Text = msg;
+                operation_log(data.msg);
             });
         }
 
+        public void operation_log(string info)
+        {
+            Program.log.Info(info);
+            string currentTime = DateTime.Now.ToString("hh:mm:ss");
+            richTextBox1.Text += currentTime + "  " + info + "\n";
+        }
         public void on_heart_beat_timeout_handle(bool connected)
         {
             Invoke((MethodInvoker)delegate
@@ -883,6 +896,7 @@ namespace OrderEasy
                 SetPrice();
                 SetVol();
             }
+            SetFocus();
         }
 
         public void UpdateListView(Tick_TenEntrust ticker)
@@ -946,7 +960,33 @@ namespace OrderEasy
                 lastIndex = Convert.ToInt32((firstPrice - ticker.last) / tickPoint) + 1;
                 grid1[lastIndex, 3].Value = "(" + ticker.vol + ")" + FormatPrice(ticker.last);
                 grid1[lastIndex, 3].View = lastCell;
+                setLastCell(ticker);
             }
+        }
+        private void setLastCell(MdfTicker ticker)
+        {
+            String value = Convert.ToString(grid1[lastIndex, 3].Value);
+            ///double pre = Convert.ToDouble(value)-tick;
+            grid1[lastIndex, 3].Value = GetPrice(value);
+            grid1[lastIndex, 3].View = priceView;
+
+            lastIndex = Convert.ToInt32((firstPrice - ticker.last) / tickPoint) + 1;
+            grid1[lastIndex, 3].Value = "(" + ticker.vol + ")" + FormatPrice(ticker.last);
+            grid1[lastIndex, 3].View = lastCell;
+
+            if (ticker.last > lastPrice && lastPrice != 0)
+            {
+                grid1[lastIndex, 3].View.ForeColor = Color.Red;
+            }
+            else if (ticker.last < lastPrice)
+            {
+                grid1[lastIndex, 3].View.ForeColor = Color.Green;
+            }
+            else
+            {
+                grid1[lastIndex, 3].View.ForeColor = Color.Black;
+            }
+            lastPrice = ticker.last;
         }
         private void EntrustData()
         {
@@ -1340,7 +1380,7 @@ namespace OrderEasy
             }
             else
                 grid1[priceMap[FormatPrice(price)], index == 4 ? 2 : 4].Value = "";
-
+            
             grid1.Refresh();
         }
         #endregion
@@ -1366,12 +1406,14 @@ namespace OrderEasy
                 if (f.groupBox2.Visible)
                 {
                     f.grid1[26, 1].Value = ">";
-                    f.Height = 711;
+                    //f.Height = 711;
+                    f.Width = 653;
                 }
                 else
                 {
                     f.grid1[26, 1].Value = "<";
-                    f.Height = 605;
+                    //f.Height = 605;
+                    f.Width = 376;
                 }
                 f.SetFocus();
 
@@ -1547,6 +1589,7 @@ namespace OrderEasy
                         {
                             local_ref = pair.Key;
                             f.CacelHandle(local_ref);
+                            f.operation_log("ref:" + local_ref + " price:" + pair.Value.ToString() + " 撤买");
                             return;
                         }
                     }
@@ -1556,6 +1599,7 @@ namespace OrderEasy
                         {
                             local_ref = pair.Key;
                             f.CacelHandle(local_ref);
+                            f.operation_log("ref:" + local_ref + " price:" + pair.Value.ToString() + " 撤卖");
                             return;
                         }
                     }
@@ -1773,11 +1817,43 @@ namespace OrderEasy
 
         private void OrderEasy_FormClosing(object sender, FormClosingEventArgs e)
         {
-            ZMQControl.Instance().sendReqLogout();
-            ZMQControl.Instance().zmqTerm();
+            if (notClosePos.long_pos != 0 || notClosePos.short_pos != 0 || buyRefPriceMap.Count != 0 || sellRefPriceMap.Count != 0)
+            {
+                if (MessageBox.Show("当前还存有挂单和仓位，是否退出？", "确认", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == System.Windows.Forms.DialogResult.No)
+                {
+                    e.Cancel = true;
+                    return;
+                }
+            }
+            ZMQControl.Instance().logForm.Close();
             this.Dispose();
+
         }
 
+        private void OrderEasy_KeyUp(object sender, KeyEventArgs e)
+        {
+            if (e.KeyValue == 97 || e.KeyValue == 99)
+            {
+                if (!txtOrderQty.Focused)
+                    shortcutKey(e.KeyValue);
+            }
+        }
+
+        private void shortcutKey(int keyValue)
+        {
+            MdfTicker ticker = curTicker;
+
+            if (!enableOrder || curTicker.ask == 0 || curTicker.bid == 0)
+                return;
+            int r;
+            if (keyValue == 97 && priceMap.TryGetValue(FormatPrice(curTicker.ask), out r))
+                BuyClinkHandle(r);
+            else if (keyValue == 99 && priceMap.TryGetValue(FormatPrice(curTicker.bid), out r))
+                SellClinkHandle(r);
+
+
+            //SetOneVol(ticker.ask, ticker.askvol, true);
+        }
 
     }
 }

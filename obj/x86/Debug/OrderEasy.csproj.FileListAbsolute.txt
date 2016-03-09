@@ -149,3 +149,4 @@ D:\work\OrderEasy - new\OrderEasy\obj\x86\Debug\OrderEasy.Properties.Resources.r
 D:\work\OrderEasy - new\OrderEasy\obj\x86\Debug\OrderEasy.SetForm.resources
 D:\work\OrderEasy - new\OrderEasy\obj\x86\Debug\OrderEasy.csproj.GenerateResource.Cache
 D:\work\OrderEasy - new\OrderEasy\obj\x86\Debug\OrderEasy.LoginForm.resources
+D:\work\OrderEasy - new\OrderEasy\obj\x86\Debug\OrderEasy.csprojResolveAssemblyReference.cache
