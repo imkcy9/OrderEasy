@@ -102,6 +102,15 @@ namespace order_easy
       get { return _symbol_tip; }
       set { _symbol_tip = value; }
     }
+
+    private int _exchange_type = default(int);
+    [global::ProtoBuf.ProtoMember(5, IsRequired = false, Name=@"exchange_type", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
+    [global::System.ComponentModel.DefaultValue(default(int))]
+    public int exchange_type
+    {
+      get { return _exchange_type; }
+      set { _exchange_type = value; }
+    }
     private global::ProtoBuf.IExtension extensionObject;
     global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
       { return global::ProtoBuf.Extensible.GetExtensionObject(ref extensionObject, createIfMissing); }

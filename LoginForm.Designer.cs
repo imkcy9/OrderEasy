@@ -41,7 +41,6 @@
             // 
             // comb_Instrument
             // 
-            this.comb_Instrument.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.comb_Instrument.FormattingEnabled = true;
             this.comb_Instrument.Location = new System.Drawing.Point(131, 82);
             this.comb_Instrument.Name = "comb_Instrument";

@@ -19,7 +19,7 @@ namespace OrderEasy.common
     struct sqlCommand
     {
         //public const string mySqlCon = "Database='rctech';Data Source='192.168.0.10';User Id='test';Password='test';charset='utf8'";
-        public const string selectStock = "select t.stock_code,t.tick,t.active,ifnull(t.stock_name,'') stock_name from sb_trading_control.sb_stock t";
+        public const string selectStock = "select stock_symbol,exchange from rctech_stock.tb_stock_symbol t";
         public const string selectFutureInfo = "select Product,Tip,Scale from tb_Product where IsActiva=1 and IsComb=0 ;";
         public const string selectFutureInstrument = "select Product,Pair from tb_Product a,tb_Pair b where a.id=b.ProductID and a.IsActiva=1 and a.IsComb=0";
         public const string selectAccountPair = "select SubAccount,Account,Name,(SELECT IP as ip  from tb_Server where tb_Server.ID= tb_Account.ServerID) as sererip,(SELECT  `Port`  from tb_Server where tb_Server.ID= tb_Account.ServerID) as ipPort from tb_Account  ;";
@@ -34,6 +34,7 @@ namespace OrderEasy.common
         public string symbols = "";
         public Dictionary<string, Symbol> symbolDic = new Dictionary<string, Symbol>();
         public List<string> instrument = new List<string>();
+        public int exchangeId = 0;
     }
     class Symbol
     {
@@ -75,6 +76,7 @@ namespace OrderEasy.common
         public string control_id = "";
         private string sqlServerCon = "";
         private string mysqlCon = "";
+        private string mysqlCon_stock = "";
         private string mySqlPswd = "";
         private string sliptKey = "";
         public string category = "";
@@ -93,6 +95,7 @@ namespace OrderEasy.common
             SetDic(addrDic, "subAddr");
             //mysqlCon = sqlCommand.mySqlCon;
             mysqlCon = ConfigurationManager.AppSettings["mySqlCon"];
+            mysqlCon_stock = ConfigurationManager.AppSettings["mySqlCon_stock"];
             mySqlPswd = ConfigurationManager.AppSettings["mySqlPswd"];
             //routerAddr = ConfigurationManager.AppSettings["routerAddr"];
             subaccount = ConfigurationManager.AppSettings["subaccount"];
@@ -102,8 +105,9 @@ namespace OrderEasy.common
             string strat = ConfigurationManager.AppSettings["strat"];
             instrument = ConfigurationManager.AppSettings["instrument"];
             control_id = "easy_" + subaccount + "_" + category + "_" + strat;
-            SetFutureDic(sqlCommand.selectFutureInfo, sqlCommand.selectFutureInstrument);
             SetStockDic(sqlCommand.selectStock);
+            SetFutureDic(sqlCommand.selectFutureInfo, sqlCommand.selectFutureInstrument);
+            
             SetAccount(sqlCommand.selectAccountPair);
             SetPswd(sqlCommand.selectPswdPair);
         }
@@ -153,15 +157,18 @@ namespace OrderEasy.common
         }
         private void SetStockDic(string sql)
         {
-            List<string> list = SelectData(mysqlCon, sql);
+            List<string> list = SelectData(mysqlCon_stock, sql);
             foreach (string value in list)
             {
                 Future f = new Future();
                 string[] data = value.Split(sliptKey[0]);
                 f.product = data[0];
-                double.TryParse(data[1], out f.tick);
-                f.isActive = data[2] == "1" ? true : false;
-                f.point = getPointCount(data[1]);
+
+                //double.TryParse(data[1], out f.tick);
+                int.TryParse(data[1], out f.exchangeId);
+                //f.isActive = data[2] == "1" ? true : false;
+                f.isActive = true;
+                //f.point = getPointCount(data[1]);
                 stockDic.Add(f.product, f);
             }
         }
@@ -190,19 +197,34 @@ namespace OrderEasy.common
 
             foreach (Future f in listF)
             {
-                List<string> list2 = SelectData(mysqlCon, sql2 + " and Product=" + "\"" + f.product + "\"");
-                foreach (string lis in list2)
+                List<string> list2 = new List<string>() ;
+                if (f.product == "stock")
                 {
-                    string[] strLis = lis.Split(sliptKey[0]);
-                    if (f.product == strLis[0])
+                    foreach ( Future pair in stockDic.Values)
                     {
-                        string[] InstruLis = strLis[1].Split('-');
-                        if (!f.instrument.Contains(InstruLis[0]))
-                            f.instrument.Add(InstruLis[0]);
-                        if (!f.instrument.Contains(InstruLis[1]))
-                            f.instrument.Add(InstruLis[1]);
+                        if (!f.instrument.Contains(pair.product))
+                            f.instrument.Add(pair.product);
+                    }
+                    Common.Instance().futureDic.Add(f.product, f);
+                }
+                else
+                {
+                    list2 = SelectData(mysqlCon, sql2 + " and Product=" + "\"" + f.product + "\"");
+                    foreach (string lis in list2)
+                    {
+                        string[] strLis = lis.Split(sliptKey[0]);
+                        if (f.product == strLis[0])
+                        {
+                            string[] InstruLis = strLis[1].Split('-');
+                            if (!f.instrument.Contains(InstruLis[0]))
+                                f.instrument.Add(InstruLis[0]);
+                            if (!f.instrument.Contains(InstruLis[1]))
+                                f.instrument.Add(InstruLis[1]);
+                        }
                     }
                 }
+                
+
                 if(list2.Count != 0)
                     Common.Instance().futureDic.Add(f.product, f);
             }

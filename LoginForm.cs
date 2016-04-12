@@ -47,7 +47,7 @@ namespace OrderEasy
             //{
             //    this.comb_account.Items.Add(pair.Key);
             //}
-            comb_product.Items.Add("ST");
+            //comb_product.Items.Add("ST");
             comb_account.Text = common.subaccount;
             comb_product.SelectedIndex = comb_product.Items.IndexOf(common.category);
             comb_Instrument.SelectedIndex = comb_Instrument.Items.IndexOf(common.instrument);
@@ -259,6 +259,10 @@ namespace OrderEasy
             data.account = common.AccountDic[comb_account.Text].motherAccount;
             data.symbol = comb_Instrument.Text;
             data.symbol_tip = this.current_tick;
+            
+            Future temp = new Future();
+            if (comb_product.Text == "stock" && common.stockDic.TryGetValue(comb_Instrument.Text, out temp))
+                data.exchange_type = common.stockDic[comb_Instrument.Text].exchangeId;
 
             MemoryStream sParam = new MemoryStream();
             sParam.Seek(0, SeekOrigin.Begin);

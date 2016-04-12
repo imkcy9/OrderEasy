@@ -110,3 +110,4 @@ D:\work\OrderEasy - new\OrderEasy\obj\x86\Release\OrderEasy.LoginForm.resources
 D:\work\OrderEasy - new\OrderEasy\obj\x86\Release\OrderEasy.csproj.GenerateResource.Cache
 D:\work\OrderEasy - new\OrderEasy\obj\x86\Release\OrderEasy.exe
 D:\work\OrderEasy - new\OrderEasy\obj\x86\Release\OrderEasy.pdb
+D:\work\OrderEasy - new\OrderEasy\obj\x86\Release\OrderEasy.csprojResolveAssemblyReference.cache

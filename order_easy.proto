@@ -1,4 +1,4 @@
-package order_easy;
+﻿package order_easy;
 
 //dir
 //#define RC_ORDER_BUY '0'
@@ -45,6 +45,7 @@ message login_req{
     required string account = 2; //母帐号
     required string symbol = 3;
     required double symbol_tip = 4;
+    optional int32 exchange_type=5;
 }
 
 //登录应答
